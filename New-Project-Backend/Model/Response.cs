@@ -1,11 +1,10 @@
 ﻿namespace New_Project_Backend.Model
 {
-	public class Response
+	public class Response : Services.UserDetails
 	{
-		public int statusCode { get; set; }
+        public string Password { get; set; } = string.Empty;
+        public string Token { get; set; } = string.Empty;
 
-		public int statusMessage { get; set; }
 
-
-	}
+    }
 }

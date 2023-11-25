@@ -17,6 +17,24 @@ builder.Services.AddSwaggerGen();
 
 //Added Cors For All Websites
 
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+	.AddJwtBearer(options =>
+	{
+		options.RequireHttpsMetadata = false;
+		options.SaveToken = true;
+		options.TokenValidationParameters = new TokenValidationParameters
+		{
+			ValidateIssuer = true,
+			ValidateAudience = true,
+			ValidateLifetime = true,
+			ValidIssuer = builder.Configuration["Token:Issuer"],
+			IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Token:Key"]))
+		};
+	});
+
+
+
 builder.Services.AddCors(options =>
 {
 	options.AddDefaultPolicy(policy =>
@@ -45,6 +63,8 @@ if (app.Environment.IsDevelopment())
 app.UseCors();
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
