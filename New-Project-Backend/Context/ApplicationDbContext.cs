@@ -10,7 +10,5 @@ namespace New_Project_Backend.Data
 		}
 
 		public DbSet<Login> Registration { get; set; }
-
-		public DbSet<Signin> UserLogin { get; set; }
 	}
 }

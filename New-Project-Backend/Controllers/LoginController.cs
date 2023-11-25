@@ -2,12 +2,16 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using New_Project_Backend.Data;
 using New_Project_Backend.Model;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using New_Project_Backend.Extensions;
 using System.Text;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace New_Project_Backend.Controllers
 {
@@ -19,71 +23,79 @@ namespace New_Project_Backend.Controllers
 		private readonly IConfiguration _config;
 
 
-		public LoginController(ApplicationDbContext db, IConfiguration configuration)
+        public LoginController(ApplicationDbContext db, IConfiguration configuration)
         {
             _db = db;
 			_config = configuration;
         }
 
 		[HttpPost("Register")]
-		public IActionResult register(Login login)
+		public IActionResult register([FromBody] Login login)
 		{
-			_db.Add(login);
-			_db.SaveChanges();
-
-			return Ok(login);
-		}
-
-		[HttpPost("Login")]
-		public async Task<IActionResult> login(Signin signin)
-		{
-
-			if (signin != null)
+			if (login != null)
 			{
-				var loginCheck = _db.Registration.Where(e => e.Email == signin.Email && e.Password == signin.Password).FirstOrDefault();
-				if (loginCheck == null)
+				var _newUser = new Login()
 				{
-					return BadRequest("Inavlid Credentials");
-				}
-				else
+					Username = login.Username,
+					Email = login.Email,
+					Password = Extensions.EncryptDecrypt.EncryptString(login.Password),
+					RoleName = login.RoleName,
+					termAccept = login.termAccept
+
+				};
+
+				_db.Add(_newUser);
+				_db.SaveChanges();
+				return Ok(new ResponseBodyResource<Login>()
 				{
-					//signin.AccessToken = GetToken(signin);
-					_db.Add(signin);
-					_db.SaveChanges();
-					return Ok(signin);
-				}
+					Message = ErrorCodes.NewUserAddedSuccessFully.ToString(),
+					Result = login
+				});
 			}
 			else
 			{
-				return BadRequest("No Data Posted");
+				return BadRequest(ErrorCodes.UnableToAddUser.ToString());
+			}
+
+		}
+
+		[HttpPost("Login")]
+		public async Task<IActionResult> login([FromBody] Signin signin)
+		{
+			var _loggedin = new Signin()
+			{
+				Email = signin.Email,
+				Password = Extensions.EncryptDecrypt.EncryptString(signin.Password),
+                
+            };
+            if (signin != null)
+            {
+				var loginCheck = _db.Registration.Where(e => e.Email == _loggedin.Email && e.Password == _loggedin.Password).FirstOrDefault();
+				if (loginCheck == null)
+				{
+                    return Ok(new ResponseBodyResource<Signin>()
+                    {
+                        Message = ErrorCodes.UnableToLogin.ToString(),
+                    });
+                }
+				else
+				{
+                    return Ok(new ResponseBodyResource<Signin>()
+                    {
+						Message = ErrorCodes.LoggedInSuccessFully.ToString(),
+                        Result = signin
+                    });
+                    
+				}
+
+               
+            }
+			else
+			{
+				return BadRequest(ErrorCodes.UnableToLogin.ToString());
 			};
 
 
 		}
-
-		//public string GetToken(Signin signin)
-		//{
-		//	var claims = new[]
-		//	{
-		//		new Claim(JwtRegisteredClaimNames.Sub, _config["Jwt:Subject"]),
-		//		new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-		//		new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
-		//		new Claim("Id", signin.id.ToString()),
-		//		new Claim("Email", signin.Email),
-		//	};
-
-		//	var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-		//	var signedin = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-		//	var token = new JwtSecurityToken(
-		//		_config["Jwt:Issuer"],
-		//		_config["Jwt:Audience"],
-		//		claims,
-		//		expires: DateTime.UtcNow.AddDays(10),
-		//		signingCredentials: signedin);
-
-		//	string Token = new JwtSecurityTokenHandler().WriteToken(token);
-
-		//	return Token;
-		//}
     }
 }

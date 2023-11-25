@@ -8,21 +8,6 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//	.AddJwtBearer(options =>
-//	{
-//		options.RequireHttpsMetadata = false;
-//		options.SaveToken = true;
-//		options.TokenValidationParameters = new TokenValidationParameters
-//		{
-//			ValidateIssuer = true,
-//			ValidateAudience = true,
-//			ValidateLifetime = true,
-//			ValidIssuer = builder.Configuration["Jwt:Issuer"],
-//			IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-//		};
-//	});
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -60,8 +45,6 @@ if (app.Environment.IsDevelopment())
 app.UseCors();
 
 app.UseHttpsRedirection();
-
-//app.UseAuthentication();
 
 app.UseAuthorization();
 

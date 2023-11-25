@@ -1,39 +1,43 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using static New_Project_Backend.Enums.CustomEnums;
 
 namespace New_Project_Backend.Model
 {
-	public class Login
+    public class Login
 	{
 		[Key]
-		public int Id { get; set; }
+		public int User_id { get; set; }
 
 		[Required]
-		public string? Username { get; set; }
+		public string? Username { get; set; } = string.Empty;
 
 		[Required]
+		[DataType(DataType.Password)]
+		public string? Password { get; set; } = string.Empty;
 
-		public string? Password { get; set; }
+        [Required]
+        [DataType(DataType.EmailAddress)]
+        public string? Email { get; set; } = string.Empty;
 
-		[Required]
-		public string? Email { get; set; }
+        [Required]
+		public Roles RoleName { get; set; }
+
 
 		public bool termAccept { get; set; }
+
+		public DateTime createdOn { get; set; }	
 	}
 
 	public class Signin
 	{
-		[Key]
-		public int id { get; set; }
-
 		[Required]
 		[DataType(DataType.EmailAddress)]
-		public string? Email { get; set; }
+		public string? Email { get; set; } = string.Empty;
 
-		[Required]
+        [Required]
 		[DataType(DataType.Password)]
-		public string? Password { get; set; }
-
-		public string? AccessToken { get; set; }
-		public bool Rememberme { get; set; }
+        [Display(Name = "password", Description = "Enter Valid Password")]
+        public string? Password { get; set; } = string.Empty;
+        public bool Rememberme { get; set; }
 	}
 }
