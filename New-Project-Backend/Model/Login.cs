@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using static New_Project_Backend.Enums.CustomEnums;
 
 namespace New_Project_Backend.Model
@@ -32,11 +33,13 @@ namespace New_Project_Backend.Model
 	{
 		[Required]
 		[DataType(DataType.EmailAddress)]
+		[JsonPropertyName("email")]
 		public string Email { get; set; } = string.Empty;
 
         [Required]
 		[DataType(DataType.Password)]
         [Display(Name = "password", Description = "Enter Valid Password")]
+		[JsonPropertyName("password")]
         public string Password { get; set; } = string.Empty;
         public bool Rememberme { get; set; }
 	}

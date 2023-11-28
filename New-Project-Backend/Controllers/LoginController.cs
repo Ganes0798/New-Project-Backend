@@ -12,34 +12,36 @@ using System.Text;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Authorization;
-using New_Project_Backend.Services;
+
 
 namespace New_Project_Backend.Controllers
 {
 	[Route("api/[controller]")]
-	[Authorize]
 	[ApiController]
 	public class LoginController : ControllerBase
 	{
 		private readonly ApplicationDbContext _db;
 		private readonly IConfiguration _config;
-        private readonly ITokenGeneration c_tokenService;
 
 
-        public LoginController(ApplicationDbContext db, IConfiguration configuration, ITokenGeneration token)
+        public LoginController(ApplicationDbContext db, IConfiguration configuration)
 		{
 			_db = db;
 			_config = configuration;
-			c_tokenService = token;
 		}
 
 		[HttpPost("Register")]
 		public IActionResult register([FromBody] Login login)
 		{
+			if(IsEmailExists(_db, login.Email, 0))
+			{
+                return BadRequest(ErrorCodes.EmailAlreadyExists.ToString());
+            }
 			if (login != null)
 			{
 				var _newUser = new Login()
 				{
+					User_id = login.User_id,
 					Username = login.Username,
 					Email = login.Email,
 					Password = Extensions.EncryptDecrypt.EncryptString(login.Password),
@@ -47,9 +49,10 @@ namespace New_Project_Backend.Controllers
 					termAccept = login.termAccept
 
 				};
-
-				_db.Add(_newUser);
-				_db.SaveChanges();
+                    _db.Add(_newUser);
+                    _db.SaveChanges();
+              
+			
 				return Ok(new ResponseBodyResource<Login>()
 				{
 					Message = ErrorCodes.NewUserAddedSuccessFully.ToString(),
@@ -64,7 +67,7 @@ namespace New_Project_Backend.Controllers
 		}
 
 		[HttpPost("Login")]
-		public async Task<IActionResult> login([FromBody] Signin signin)
+		public IActionResult login([FromBody] Signin signin)
 		{
 			var _loggedin = new Signin()
 			{
@@ -77,21 +80,11 @@ namespace New_Project_Backend.Controllers
                 var loginCheck = _db.Registration.Where(e => e.Email == _loggedin.Email && e.Password == _loggedin.Password).FirstOrDefault();
                 if (loginCheck != null)
                 {
-                    var _userProfile = _db.Registration.Where(xy => (xy.Email == signin.Email))
-                                             .Select(xy => new Response()
-                                             {
-                                                 Email = xy.Email,
-                                                 Password = xy.Password,
-                                                 Username = xy.Username,
-                                                 RoleName = xy.RoleName.ToString(),
-                                             }).FirstOrDefault();
 
-				       _userProfile.Token = c_tokenService.CreateToken(_userProfile);
-
-                    return Ok(new ResponseBodyResource<Response>()
+                    return Ok(new ResponseBodyResource<Signin>()
                     {
                         Message = ErrorCodes.LoggedInSuccessFully.ToString(),
-                        Result = _userProfile
+                        Result = _loggedin
                     });
                    
 				}
@@ -113,5 +106,11 @@ namespace New_Project_Backend.Controllers
 
 
 		}
+
+		private bool IsEmailExists(ApplicationDbContext db, string email, int id)
+		{
+			return db.Registration.Where(xy=> (xy.User_id != id) && (xy.Email == email)).Any();
+		}
 	}
+
 }

@@ -17,6 +17,7 @@
         UnableToLogOff,                                     
         NewUserAddedSuccessFully,
         LoggedInSuccessFully,
-        UnableToAddUser
+        UnableToAddUser,
+        EmailAlreadyExists
     }
 }
