@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MigrationTool": {
+      "commandName": "Project",
+      "commandLineArgs": "Seed"
+    }
+  }
+}

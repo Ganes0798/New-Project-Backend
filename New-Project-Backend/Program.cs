@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using New_Project_Backend.Data;
+using Project.Core.Data;
 using System.Text;
 
 
@@ -50,11 +48,6 @@ builder.Services.AddCors(options =>
 	});
 });
 
-//Register DbContext
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-{
-	options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres"));
-});
 
 var app = builder.Build();
 

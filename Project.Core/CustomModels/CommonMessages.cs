@@ -1,4 +1,10 @@
-﻿namespace New_Project_Backend.Model
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Project.Core.CustomModels
 {
     public class CustomMessages
     {
@@ -10,11 +16,11 @@
     public enum ErrorCodes
     {
         None = 0,
-        EmailDoesNotExist = 1001, 
-        InvalidCredentials,                                 
-        UnableToLogin,                                      
-        LoggedOffSuccessfully,                              
-        UnableToLogOff,                                     
+        EmailDoesNotExist = 1001,
+        InvalidCredentials,
+        UnableToLogin,
+        LoggedOffSuccessfully,
+        UnableToLogOff,
         NewUserAddedSuccessFully,
         LoggedInSuccessFully,
         UnableToAddUser,

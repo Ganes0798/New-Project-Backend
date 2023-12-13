@@ -3,15 +3,14 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using New_Project_Backend.Data;
 using New_Project_Backend.Model;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Authorization;
+using Project.Core.CustomModels;
+using Project.Core.Data;
 
 
 namespace New_Project_Backend.Controllers
@@ -20,11 +19,11 @@ namespace New_Project_Backend.Controllers
 	[ApiController]
 	public class LoginController : ControllerBase
 	{
-		private readonly ApplicationDbContext _db;
+		private readonly ProjectDbContext _db;
 		private readonly IConfiguration _config;
 
 
-        public LoginController(ApplicationDbContext db, IConfiguration configuration)
+        public LoginController(ProjectDbContext db, IConfiguration configuration)
 		{
 			_db = db;
 			_config = configuration;
@@ -107,7 +106,7 @@ namespace New_Project_Backend.Controllers
 
 		}
 
-		private bool IsEmailExists(ApplicationDbContext db, string email, int id)
+		private bool IsEmailExists(ProjectDbContext db, string email, int id)
 		{
 			return db.Registration.Where(xy=> (xy.User_id != id) && (xy.Email == email)).Any();
 		}
