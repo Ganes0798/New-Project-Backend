@@ -8,7 +8,7 @@ using Project.Core.Data;
 
 #nullable disable
 
-namespace Project.Core.Migrations
+namespace Project.Core.Data.Migrations
 {
     [DbContext(typeof(ProjectDbContext))]
     partial class ProjectDbContextModelSnapshot : ModelSnapshot
@@ -23,19 +23,34 @@ namespace Project.Core.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "uuid-ossp");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Project.Core.CustomModels.Login", b =>
+            modelBuilder.Entity("Project.Core.CustomModels.Register", b =>
                 {
-                    b.Property<int>("User_id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasColumnName("user_id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("User_id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on")
+                        .HasDefaultValueSql("Now()");
+
+                    b.Property<int>("DataState")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("user_emailId");
+
+                    b.Property<DateTime>("ModifiedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modified_on")
+                        .HasDefaultValueSql("Now()");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -51,17 +66,11 @@ namespace Project.Core.Migrations
                         .HasColumnType("text")
                         .HasColumnName("user_name");
 
-                    b.Property<DateTime>("createdOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_on")
-                        .HasDefaultValueSql("Now()");
-
                     b.Property<bool>("termAccept")
                         .HasColumnType("boolean")
                         .HasColumnName("accept");
 
-                    b.HasKey("User_id");
+                    b.HasKey("Id");
 
                     b.ToTable("registration", (string)null);
                 });

@@ -11,8 +11,17 @@ namespace Project.Core.Enums
         public enum Roles
         {
             None = 0,
+            SuperAdmin,
             Admin,
             User
         }
+
+        public enum RecordState
+        {
+            None = 0,
+            Active,
+            Deleted
+        }
+
     }
 }

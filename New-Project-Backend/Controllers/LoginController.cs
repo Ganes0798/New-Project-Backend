@@ -19,82 +19,59 @@ namespace New_Project_Backend.Controllers
 	[ApiController]
 	public class LoginController : ControllerBase
 	{
-		private readonly ProjectDbContext _db;
 		private readonly IConfiguration _config;
+		//private readonly ITokenService tokenService;
 
 
-        public LoginController(ProjectDbContext db, IConfiguration configuration)
+        public LoginController(IConfiguration configuration)
 		{
-			_db = db;
 			_config = configuration;
 		}
 
-		[HttpPost("Register")]
-		public IActionResult register([FromBody] Login login)
-		{
-			if(IsEmailExists(_db, login.Email, 0))
-			{
-                return BadRequest(ErrorCodes.EmailAlreadyExists.ToString());
-            }
-			if (login != null)
-			{
-				var _newUser = new Login()
-				{
-					User_id = login.User_id,
-					Username = login.Username,
-					Email = login.Email,
-					Password = Extensions.EncryptDecrypt.EncryptString(login.Password),
-					RoleName = login.RoleName,
-					termAccept = login.termAccept
+		
 
-				};
-                    _db.Add(_newUser);
-                    _db.SaveChanges();
-              
+		[HttpPost]
+		public IActionResult Add([FromBody] Login signin)
+		{
 			
-				return Ok(new ResponseBodyResource<Login>()
-				{
-					Message = ErrorCodes.NewUserAddedSuccessFully.ToString(),
-					Result = login
-				});
-			}
-			else
-			{
-				return BadRequest(ErrorCodes.UnableToAddUser.ToString());
-			}
-
-		}
-
-		[HttpPost("Login")]
-		public IActionResult login([FromBody] Signin signin)
-		{
-			var _loggedin = new Signin()
-			{
-				Email = signin.Email,
-				Password = Extensions.EncryptDecrypt.EncryptString(signin.Password),
-
-			};
 			if (signin != null)
 			{
-                var loginCheck = _db.Registration.Where(e => e.Email == _loggedin.Email && e.Password == _loggedin.Password).FirstOrDefault();
-                if (loginCheck != null)
-                {
-
-                    return Ok(new ResponseBodyResource<Signin>()
-                    {
-                        Message = ErrorCodes.LoggedInSuccessFully.ToString(),
-                        Result = _loggedin
-                    });
-                   
-				}
-				else
+				using (ExtendedProjectDbContext dbcontext = new ExtendedProjectDbContext(_config))
 				{
-                    return Ok(new ResponseBodyResource<Signin>()
-                    {
-                        Message = ErrorCodes.UnableToLogin.ToString(),
-                    });
+					//var _userProfile = dbcontext.Registration.Where(xy => (xy.Email == signin.Email)).Select(xy => new ProfileR()
+					//{
+					//	Id = xy.User_id,
+					//	Username = xy.Username,
+					//	RoleName = xy.RoleName.ToString(),
+					//	Password = xy.Password,
+					//}).FirstOrDefault();
+					var _loggedin = new Login()
+					{
+						Email = signin.Email,
+						Password = signin.Password
+					};
+					var loginCheck = dbcontext.Registration.Where(e => e.Email == _loggedin.Email && e.Password == _loggedin.Password).FirstOrDefault();
+					_loggedin.Password = string.Empty;
+					//_userProfile.Token = tokenService.CreateToken(_userProfile);
+					
 
-                }
+
+					return Ok(new ResponseBodyResource<Login>()
+						{
+							Message = ErrorCodes.LoggedInSuccessFully.ToString(),
+							Result = _loggedin
+						});
+
+					//else
+					//{
+					//	return Ok(new ResponseBodyResource<Signin>()
+					//	{
+					//		Message = ErrorCodes.UnableToLogin.ToString(),
+					//	});
+
+					//}
+				}
+				
 
 
 			}
@@ -105,11 +82,8 @@ namespace New_Project_Backend.Controllers
 
 
 		}
-
-		private bool IsEmailExists(ProjectDbContext db, string email, int id)
-		{
-			return db.Registration.Where(xy=> (xy.User_id != id) && (xy.Email == email)).Any();
-		}
+		
+		
 	}
 
 }
