@@ -4,10 +4,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Project.Core.Migrations
+namespace Project.Core.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class IntialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -26,7 +26,9 @@ namespace Project.Core.Migrations
                     user_emailId = table.Column<string>(type: "text", nullable: false),
                     user_role = table.Column<int>(type: "integer", nullable: false),
                     accept = table.Column<bool>(type: "boolean", nullable: false),
-                    created_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "Now()")
+                    created_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "Now()"),
+                    modified_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "Now()"),
+                    DataState = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {

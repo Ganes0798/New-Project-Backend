@@ -21,7 +21,7 @@ namespace Project.Core.Data
         {
         }
 
-        public DbSet<Login> Registration { get; set; }
+        public DbSet<Register> Registration { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -36,16 +36,18 @@ namespace Project.Core.Data
             base.OnModelCreating(modelBuilder);
             modelBuilder.HasPostgresExtension("uuid-ossp");
 
-            modelBuilder.Entity<Login>(entity =>
+            modelBuilder.Entity<Register>(entity =>
             {
                 entity.ToTable(CommonNames.Login);
-                entity.Property(e => e.User_id).HasColumnName("user_id");
+                entity.Property(e => e.Id).HasColumnName("user_id");
                 entity.Property(e => e.Username).HasColumnName("user_name");
                 entity.Property(e => e.Password).HasColumnName("user_pass");
                 entity.Property(e => e.Email).HasColumnName("user_emailId");
                 entity.Property(e => e.RoleName).HasColumnName("user_role");
                 entity.Property(e => e.termAccept).HasColumnName("accept");
-                entity.Property(e => e.createdOn).HasColumnName("created_on").HasDefaultValueSql(CommonNames.NOW);
+                entity.Property(e => e.CreatedOn).HasColumnName(CommonNames.CreatedOn).HasDefaultValueSql(CommonNames.NOW);
+                entity.Property(e => e.ModifiedOn).HasColumnName(CommonNames.ModifiedOn).HasDefaultValueSql(CommonNames.NOW);
+
             });
 
             OnModelCreatingPartial(modelBuilder);

@@ -24,6 +24,7 @@ namespace Project.Core.CustomModels
         NewUserAddedSuccessFully,
         LoggedInSuccessFully,
         UnableToAddUser,
-        EmailAlreadyExists
+        EmailAlreadyExists,
+        EmptyUserList
     }
 }
