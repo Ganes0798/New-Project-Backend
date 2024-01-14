@@ -11,6 +11,11 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Authorization;
 using Project.Core.CustomModels;
 using Project.Core.Data;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using Project.Core.Interface;
+using static Project.Core.Enums.CommonEnums;
+using New_Project_Backend.Extensions;
 
 
 namespace New_Project_Backend.Controllers
@@ -20,15 +25,18 @@ namespace New_Project_Backend.Controllers
 	public class LoginController : ControllerBase
 	{
 		private readonly IConfiguration _config;
-		//private readonly ITokenService tokenService;
+		private readonly ITokenService c_tokenService;
+		//public ITokenService tokenService;
 
 
-        public LoginController(IConfiguration configuration)
+		public LoginController(IConfiguration configuration, ITokenService token)
 		{
 			_config = configuration;
+			c_tokenService = token;
+
 		}
 
-		
+
 
 		[HttpPost]
 		public IActionResult Add([FromBody] Login signin)
@@ -38,33 +46,39 @@ namespace New_Project_Backend.Controllers
 			{
 				using (ExtendedProjectDbContext dbcontext = new ExtendedProjectDbContext(_config))
 				{
-					//var _userProfile = dbcontext.Registration.Where(xy => (xy.Email == signin.Email)).Select(xy => new ProfileR()
-					//{
-					//	Id = xy.User_id,
-					//	Username = xy.Username,
-					//	RoleName = xy.RoleName.ToString(),
-					//	Password = xy.Password,
-					//}).FirstOrDefault();
-					var _loggedin = new Login()
+					var _userProfile = dbcontext.Registration.Where(xy => (xy.Email == signin.Email))
+											.Select(xy => new DetailToken()
+											{
+												Id = xy.Id,
+												Email = xy.Email,
+												Password = xy.Password,
+												UserName = xy.Username,
+												RoleName = xy.RoleName.ToString(),
+											}).FirstOrDefault();
+
+
+					if (_userProfile == null)
 					{
-						Email = signin.Email,
-						Password = signin.Password
-					};
-					var loginCheck = dbcontext.Registration.Where(e => e.Email == _loggedin.Email && e.Password == _loggedin.Password).FirstOrDefault();
-					_loggedin.Password = string.Empty;
-					//_userProfile.Token = tokenService.CreateToken(_userProfile);
-					
+						return new ObjectResult(new ResponseBodyResource<ErrorCodes>(ErrorCodes.EmailDoesNotExist));
+					}
 
 
-					return Ok(new ResponseBodyResource<Login>()
-						{
-							Message = ErrorCodes.LoggedInSuccessFully.ToString(),
-							Result = _loggedin
-						});
+					_userProfile.Password = string.Empty;
+					_userProfile.Token = c_tokenService.CreateToken(_userProfile);
+
+
+
+
+
+					return Ok(new ResponseBodyResource<DetailToken>()
+					{
+						Message = ErrorCodes.LoggedInSuccessFully.ToString(),
+						Result = _userProfile
+					});
 
 					//else
 					//{
-					//	return Ok(new ResponseBodyResource<Signin>()
+					//	return Ok(new ResponseBodyResource<Login>()
 					//	{
 					//		Message = ErrorCodes.UnableToLogin.ToString(),
 					//	});
@@ -82,8 +96,6 @@ namespace New_Project_Backend.Controllers
 
 
 		}
-		
-		
 	}
 
 }

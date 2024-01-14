@@ -5,9 +5,9 @@ VisualStudioVersion = 17.8.34309.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "New-Project-Backend", "New-Project-Backend\New-Project-Backend.csproj", "{869D50E6-CF2F-4666-ADBE-205EAD404A02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Project.Core", "Project.Core\Project.Core.csproj", "{B57AE41E-87EA-4F2F-B1F0-231B4D73E604}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Project.Core", "Project.Core\Project.Core.csproj", "{B57AE41E-87EA-4F2F-B1F0-231B4D73E604}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MigrationTool", "MigrationTool\MigrationTool.csproj", "{6657A42E-BEE2-4FC8-9E63-26F059954AA2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MigrationTool", "MigrationTool\MigrationTool.csproj", "{6657A42E-BEE2-4FC8-9E63-26F059954AA2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using IMS.Core.Helper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
@@ -42,7 +43,7 @@ namespace Project.Core.Helper
                 {
                     Console.WriteLine(@$"{DateTime.Now} No migrations to apply.");
                 }
-                //DbSeeder.SeedDB(Configuration, dbContext);
+                DbSeeder.SeedDB(Configuration, dbContext);
 
             }
             Console.WriteLine(@$"{DateTime.Now} Press Ctrl+C to terminate this process.");
