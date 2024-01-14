@@ -67,6 +67,7 @@ namespace Project.Core.CustomModels
 		[Display(Name = "password", Description = "Enter Valid Password")]
 		[JsonPropertyName("password")]
 		public string Password { get; set; } = string.Empty;
+		
 		public bool Rememberme { get; set; }
 	}
 }
