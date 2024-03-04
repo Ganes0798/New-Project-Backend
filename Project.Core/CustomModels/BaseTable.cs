@@ -33,16 +33,20 @@ namespace Project.Core.CustomModels
 
 	public class Register : BaseTable
 	{
-		[JsonIgnore]
 		[Key]
-		public int Id { get; set; }
+		public long Id { get; set; }
 
 		[Required]
-		public string Username { get; set; } = string.Empty;
+		public string FirstName { get; set; } = string.Empty;
 
-		[Required]
+		public string LastName { get; set; } = string.Empty;
+
+        [Required]
 		[DataType(DataType.Password)]
 		public string Password { get; set; } = string.Empty;
+
+		[JsonIgnore]
+		public string ConfirmPassword { get; set; } = string.Empty;
 
 		[Required]
 		[DataType(DataType.EmailAddress)]
@@ -70,4 +74,52 @@ namespace Project.Core.CustomModels
 		
 		public bool Rememberme { get; set; }
 	}
+
+	public class chngePwd
+	{
+		public string OldPassword { get; set; } = string.Empty;
+
+		public string NewPassword { get; set; } = string.Empty;
+	}
+
+	
+
+	public class Product : BaseTable
+	{
+		[Key]
+		public long Id { get; set; }
+
+		[ForeignKey("UserFkId")]
+		public Register register { get; set; }
+
+		
+		public long UserFkId { get; set; }
+		public string ProductName { get; set; } = string.Empty;
+
+		public string ProductDescription { get; set; } = string.Empty;
+
+		public int ProductQuantity { get; set; }
+
+		public Category Category { get; set; }
+
+
+	}
+
+	public class Order : BaseTable
+	{
+		[Key]
+		public long Id { get; set; }
+
+		[ForeignKey("ProductFkId")]
+		public Product product { get; set; }
+
+		public long ProductFkId { get; set; }
+
+		[ForeignKey("UserFkId")]
+		public Register register { get; set; } 
+
+		public long UserFkId { get; set;}
+	}
+
+	
 }

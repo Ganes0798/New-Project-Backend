@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace New_Project_Backend.Extensions
+namespace Project.Core.Extensions
 {
     public class EncryptDecrypt
     {

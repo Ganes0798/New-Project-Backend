@@ -10,4 +10,11 @@ namespace New_Project_Backend.Model
 
 
 	}
+
+
+
+	//public class AppSettings
+	//{
+
+	//}
 }

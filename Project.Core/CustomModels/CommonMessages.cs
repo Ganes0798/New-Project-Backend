@@ -25,6 +25,12 @@ namespace Project.Core.CustomModels
         LoggedInSuccessFully,
         UnableToAddUser,
         EmailAlreadyExists,
-        EmptyUserList
-    }
+        EmptyUserList,
+		InvalidEnumRole,
+		UserAlreadyExist,
+		EmptyUsers,
+        ProductsAddedSuccessfully,
+		PasswordMismatch,
+		PasswordUpdatedSuccessfully
+	}
 }

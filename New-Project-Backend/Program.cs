@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using New_Project_Backend.Extensions;
+using New_Project_Backend.Model;
 using Project.Core.Data;
+using Project.Core.Interface;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
@@ -50,16 +53,16 @@ builder.Services.AddApplicationServices(builder.Configuration);
 //        ValidAudience = builder.Configuration["JWT:Audience"]
 //    };
 //});
-
-
+	builder.Services.Configure<ApplicationSettings>(config.GetSection("ApplicationSettings"));
 //Added Cors For All Websites
 builder.Services.AddCors(options =>
 {
-	options.AddDefaultPolicy(policy =>
+	options.AddPolicy(name: "CorsPolicy", builder =>
 	{
-		policy.AllowAnyOrigin()
+		builder.WithOrigins("http://localhost:4200")
+		.AllowAnyHeader()
 		.AllowAnyMethod()
-		.AllowAnyHeader();
+		.AllowCredentials();
 	});
 });
 
@@ -73,7 +76,7 @@ if (app.Environment.IsDevelopment())
 	app.UseSwaggerUI();
 }
 
-app.UseCors();
+app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
 

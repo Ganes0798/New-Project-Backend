@@ -26,7 +26,8 @@ namespace New_Project_Backend.Extensions
 					   ValidIssuer = config["JWT:Issuer"],
 					   IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JWT:SecretKey"]!)),
 					   ValidateIssuer = true,
-					   ValidateAudience = false //dev
+					   ValidAudience = config["JWT:Audience"],
+					   ValidateAudience = true
 				   };
 			   });
 

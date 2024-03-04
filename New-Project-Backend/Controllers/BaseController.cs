@@ -1,7 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using New_Project_Backend.Model;
+using Project.Core.CustomModels;
+using Project.Core.Data;
 using Project.Core.Interface;
 using System.Security.Claims;
+using static Project.Core.Enums.CommonEnums;
 
 namespace New_Project_Backend.Controllers
 {
@@ -26,6 +30,40 @@ namespace New_Project_Backend.Controllers
 			string _name = User.Claims.Where(c => c.Type == ClaimTypes.Name).Select(c => c.Value).FirstOrDefault();
 
 			return new UserDetails() { Id = Convert.ToInt64(_Id), RoleName = _role, UserName = _name, Email = _email };
+		}
+
+
+		protected Register GetUserDetails(ExtendedProjectDbContext dbContext, long id)
+		{
+			return dbContext.Users.Where(xy => ((xy.DataState == RecordState.Active) &&
+												(xy.Id == id))).FirstOrDefault();
+		}
+
+
+		protected ObjectResult SendErrorMessage(ErrorCodes errorCode)
+		{
+			var failedResp = new ResponseBodyResource<string>(false, StatusCodes.Status200OK, errorCode)
+			{
+				Success = false
+			};
+			return new ObjectResult(failedResp)
+			{
+				ContentTypes = { "application/problem+json" },
+				StatusCode = StatusCodes.Status200OK
+			};
+		}
+
+		protected ObjectResult SendSuccessMessage(ErrorCodes errorCode)
+		{
+			var successResp = new ResponseBodyResource<string>()
+			{
+				Result = errorCode.ToString()
+			};
+			return new ObjectResult(successResp)
+			{
+				ContentTypes = { "application/json" },
+				StatusCode = StatusCodes.Status200OK
+			};
 		}
 	}
 }

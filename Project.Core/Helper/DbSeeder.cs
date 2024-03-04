@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Project.Core.Extensions;
 using Project.Core.CustomModels;
 using Project.Core.Data;
 using System;
@@ -25,30 +26,31 @@ namespace IMS.Core.Helper
                 Console.WriteLine("Seeding DB...");
 
 				List<Register> _addUsers = new List<Register>();
-				Register _newUser = InitializeNewUser("SuperAdmin", "superadmin@g2met.com", Roles.SuperAdmin);
+				Register _newUser = InitializeNewUser("SuperAdmin", "", "superadmin@g2met.com", Roles.SuperAdmin);
 				_addUsers.Add(_newUser);
 
-				_newUser = InitializeNewUser("Admin", "admin@g2met.com", Roles.Admin);
+				_newUser = InitializeNewUser("Admin", "", "admin@g2met.com", Roles.Admin);
 				_addUsers.Add(_newUser);
 
-				_newUser = InitializeNewUser("user", "user@g2met.com", Roles.User);
+				_newUser = InitializeNewUser("user", "", "user@g2met.com", Roles.User);
 				_addUsers.Add(_newUser);
 
-				dbContext.Registration.AddRange(_addUsers);
+				dbContext.Users.AddRange(_addUsers);
 				dbContext.SaveChanges();
 				Console.WriteLine("User seeded successfully...");
 
 
 			}
         }
-		private static Register InitializeNewUser(string firstName, string email, Roles role)
+		private static Register InitializeNewUser(string firstName, string lastName, string email, Roles role)
 		{
 			return new Register()
 			{
-				Username = firstName,
+				FirstName = firstName,
+				LastName = lastName,
 				Email = email,
 				RoleName = role,
-				Password = "Ganesh1234",
+				Password = EncryptDecrypt.EncryptString("PasswordA!1234@"),
 			};
 		}
 	}
