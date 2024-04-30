@@ -30,7 +30,8 @@ namespace New_Project_Backend.Service
 				}),
 				Expires = DateTime.UtcNow.AddDays(10),
 				SigningCredentials = creds,
-				Issuer = _config["Token:Issuer"]
+				Issuer = _config["JWT:Issuer"],
+				Audience = _config["JWT:Audience"]
 			};
 
 			var tokenHandler = new JwtSecurityTokenHandler();

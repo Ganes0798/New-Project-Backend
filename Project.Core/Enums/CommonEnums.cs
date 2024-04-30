@@ -23,5 +23,5 @@ namespace Project.Core.Enums
             Deleted
         }
 
-    }
+	}
 }

@@ -1,68 +1,95 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using New_Project_Backend.Extensions;
 using New_Project_Backend.Model;
 using Project.Core.CustomModels;
 using Project.Core.Data;
+using Project.Core.Extensions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static Project.Core.Enums.CommonEnums;
 
 namespace New_Project_Backend.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class RegisterController : ControllerBase
+	public class RegisterController : BaseController
 	{
-		private readonly IConfiguration Configuration;
 
-		public RegisterController(IConfiguration configuration)
+		public RegisterController(IConfiguration config) : base(config)
 		{
-			Configuration = configuration;
 		}
-		
+
+		[AllowAnonymous]
 		[HttpPost]
 		public IActionResult Add([FromBody] Register register)
 		{
 
-			if (register != null)
+			var _userDetails = GetCurrentUserDetail();
+			try
 			{
-				using (ExtendedProjectDbContext dbcontext = new ExtendedProjectDbContext(Configuration))
+				using (ExtendedProjectDbContext dbContext = new ExtendedProjectDbContext(c_config))
 				{
-					if (IsEmailExists(dbcontext, register.Email, 0))
+					if (IsEmailExists(dbContext, register.Email, 0))
 					{
-						return BadRequest(ErrorCodes.EmailAlreadyExists.ToString());
+						return SendErrorMessage(ErrorCodes.UserAlreadyExist);
 					}
+
+					Roles _userRole = Roles.User;
+					//if (!Enum.IsDefined(typeof(Roles), _userRole))
+					//{
+					//	return SendErrorMessage(ErrorCodes.InvalidEnumRole);
+					//}
+
 					var _newUser = new Register()
 					{
-						Id = register.Id,
-						Username = register.Username,
+						FirstName = register.FirstName,
+						LastName = register.LastName,
 						Email = register.Email,
 						Password = EncryptDecrypt.EncryptString(register.Password),
-						RoleName = register.RoleName,
-						termAccept = register.termAccept
-
+						ConfirmPassword = EncryptDecrypt.EncryptString(register.ConfirmPassword),
+						RoleName = _userRole,
 					};
+					if(register.ConfirmPassword == register.Password)
+					{
+						using (var transaction = dbContext.Database.BeginTransaction())
+						{
+							try
+							{
+								dbContext.Users.Add(_newUser);
+								dbContext.SaveChanges();
+								transaction.Commit();
+							}
+							catch (Exception)
+							{
+								transaction.Rollback();
+								throw;
+							}
+						}
 
-					dbcontext.Registration.Add(_newUser);
-					dbcontext.SaveChanges();
+						return SendSuccessMessage(ErrorCodes.NewUserAddedSuccessFully);
+					}
+					else
+					{
+						return SendErrorMessage(ErrorCodes.CheckThePasswords);
+					}
+					
+					//return Ok(new ResponseBodyResource<Users>()
+					//{
+					//    Result = _newUser
+					//});
 				}
-
-
-				return Ok(new ResponseBodyResource<Register>()
-				{
-					Message = ErrorCodes.NewUserAddedSuccessFully.ToString(),
-					Result = register
-				});
 			}
-			else
+			catch (Exception)
 			{
-				return BadRequest(ErrorCodes.UnableToAddUser.ToString());
+				throw;
 			}
 
 		}
 
 		private bool IsEmailExists(ProjectDbContext db, string email, int id)
 		{
-			return db.Registration.Where(xy => (xy.Id != id) && (xy.Email == email)).Any();
+			return db.Users.Where(xy => (xy.Id != id) && (xy.Email == email)).Any();
 		}
 	}
 }

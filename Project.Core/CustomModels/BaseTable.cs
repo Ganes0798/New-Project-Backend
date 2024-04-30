@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -33,16 +34,22 @@ namespace Project.Core.CustomModels
 
 	public class Register : BaseTable
 	{
-		[JsonIgnore]
 		[Key]
-		public int Id { get; set; }
+		public long Id { get; set; }
 
 		[Required]
-		public string Username { get; set; } = string.Empty;
+		public string FirstName { get; set; } = string.Empty;
+
+		[AllowNull]
+		public string? LastName { get; set; } = string.Empty;
+
+        [Required]
+		[DataType(DataType.Password)]
+		public string Password { get; set; } = string.Empty;
 
 		[Required]
 		[DataType(DataType.Password)]
-		public string Password { get; set; } = string.Empty;
+		public string ConfirmPassword { get; set; } = string.Empty;
 
 		[Required]
 		[DataType(DataType.EmailAddress)]
@@ -50,9 +57,6 @@ namespace Project.Core.CustomModels
 
 		[Required]
 		public Roles RoleName { get; set; }
-
-
-		public bool termAccept { get; set; }
 	}
 
 	public class Login
@@ -67,7 +71,69 @@ namespace Project.Core.CustomModels
 		[Display(Name = "password", Description = "Enter Valid Password")]
 		[JsonPropertyName("password")]
 		public string Password { get; set; } = string.Empty;
-		
-		public bool Rememberme { get; set; }
 	}
+
+	public class chngePwd
+	{
+		public string OldPassword { get; set; } = string.Empty;
+
+		public string NewPassword { get; set; } = string.Empty;
+	}
+
+	
+
+	public class Product : BaseTable
+	{
+		[Key]
+		public long Id { get; set; }
+
+
+		[ForeignKey("UserFkId")]
+		public Register register { get; set; }
+
+		
+		public long UserFkId { get; set; }
+
+
+		public string ProductName { get; set; } = string.Empty;
+
+		public string ProductDescription { get; set; } = string.Empty;
+
+		public string ProductImageUrl { get; set; } = string.Empty;
+
+		public int ProductQuantity { get; set; }
+
+		[ForeignKey("CategoryCode")]
+		public Category CategoryById { get; set; }
+
+		public long CategoryCode { get; set; }
+	}
+
+	public class Category : BaseTable
+	{
+		public long Id { get; set; }
+		public string Name { get; set; }
+
+		public Int16 Code { get; set; }
+	}
+
+	public class Order : BaseTable
+	{
+		[Key]
+		public long Id { get; set; }
+
+		[ForeignKey("ProductFkId")]
+		public Product product { get; set; }
+
+		public long ProductFkId { get; set; }
+
+		[ForeignKey("UserFkId")]
+		public Register register { get; set; } 
+
+		public long UserFkId { get; set;}
+	}
+
+
+
+
 }

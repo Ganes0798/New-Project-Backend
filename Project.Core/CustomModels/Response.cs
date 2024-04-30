@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Project.Core.CustomModels
 {
-    public class Response
-    {
-        public string Password { get; set; } = string.Empty;
-        public string Token { get; set; } = string.Empty;
-
-
-    }
+   //public enum ActiveRoles
+   // {
+   //     None = 0,
+   //     SuperAdmin,
+   //     Admin,
+   //     User
+   // }
 }
