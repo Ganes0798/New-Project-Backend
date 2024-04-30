@@ -12,7 +12,7 @@ namespace Project.Core.Model
 			public string Email { get; set; } = string.Empty;
 			public string FirstName { get; set; } = string.Empty;
 			public string? LastName { get; set; }
-			public Roles UserRole { get; set; }
+			public string UserRole { get; set; }
 			public DateTime ModifiedOn { get; set; }
 		}
 	}

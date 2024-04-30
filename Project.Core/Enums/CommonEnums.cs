@@ -23,13 +23,5 @@ namespace Project.Core.Enums
             Deleted
         }
 
-        public enum Category
-        {
-            None = 0,
-            Electronics,
-            Fashion
-        }
-
-
 	}
 }

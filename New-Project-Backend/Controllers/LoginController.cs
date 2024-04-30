@@ -11,12 +11,8 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Authorization;
 using Project.Core.CustomModels;
 using Project.Core.Data;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 using Project.Core.Interface;
 using static Project.Core.Enums.CommonEnums;
-using New_Project_Backend.Extensions;
-using Microsoft.OpenApi.Extensions;
 using Google.Apis.Auth;
 using Microsoft.Extensions.Options;
 
@@ -157,17 +153,6 @@ namespace New_Project_Backend.Controllers
 
 					}
 				}
-
-				//var user = UserList.FirstOrDefault(x => x.UserName == payload.Name);
-
-				//if (user != null)
-				//{
-				//	return Ok(user);
-				//}
-				//else
-				//{
-				//	return BadRequest("User not found");
-				//}
 			}
 			catch (InvalidJwtException ex)
 			{
@@ -180,6 +165,77 @@ namespace New_Project_Backend.Controllers
 				return StatusCode(500, "Internal server error: " + ex.Message);
 			}
 		}
+
+		[HttpPost("GoogleSignUp")]	
+		public async Task<IActionResult> SignUpGoogle([FromBody] string credential)
+		{
+			try
+			{
+				var settings = new GoogleJsonWebSignature.ValidationSettings
+				{
+					Audience = new List<string> { _googleAuthSettings.GoogleClientId },
+				};
+
+				var payload = await GoogleJsonWebSignature.ValidateAsync(credential, settings);
+
+				using (ExtendedProjectDbContext dbContext = new ExtendedProjectDbContext(_config))
+				{
+					if (IsEmailExists(dbContext, payload.Email, 0))
+					{
+						return BadRequest(ErrorCodes.UserAlreadyExist.ToString());
+					}
+
+					Roles _userRole = Roles.User;
+					//Enum.TryParse(register.RoleName.ToString(), true, out _userRole);
+					//if (!Enum.IsDefined(typeof(Roles), _userRole))
+					//{
+					//	return SendErrorMessage(ErrorCodes.InvalidEnumRole);
+					//}
+
+					var _newUser = new Register()
+					{
+						FirstName = payload.GivenName,
+						LastName = payload.FamilyName,
+						Email = payload.Email,
+						RoleName = _userRole
+					};
+
+					using (var transaction = dbContext.Database.BeginTransaction())
+					{
+						try
+						{
+							dbContext.Users.Add(_newUser);
+							dbContext.SaveChanges();
+							transaction.Commit();
+						}
+						catch (Exception)
+						{
+							transaction.Rollback();
+							throw;
+						}
+					}
+
+					//return SendSuccessMessage(ErrorCodes.NewUserAddedSuccessFully);
+					return Ok(new ResponseBodyResource<Register>()
+					{
+						Message = ErrorCodes.NewUserAddedSuccessFully.ToString(),
+						Result = _newUser
+					});
+				}
+			}
+			catch (InvalidJwtException ex)
+			{
+				// Handle invalid JWT exceptions here
+				return BadRequest("Invalid JWT: " + ex.Message);
+			}
+			catch (Exception ex)
+			{
+				// Handle other exceptions here
+				return StatusCode(500, "Internal server error: " + ex.Message);
+			}
+		}
+
+
 
 		[HttpPost("logoff")]
 		//[AllowAuthoize(new[] { RoleType.SuperAdmin, RoleType.Admin, RoleType.User }, PrivilegeType.DoNotCheck)]
@@ -207,6 +263,9 @@ namespace New_Project_Backend.Controllers
 				return new ObjectResult(new ResponseBodyResource<ErrorCodes>(ErrorCodes.UnableToLogOff));
 			}
 		}
+		private bool IsEmailExists(ProjectDbContext db, string email, int id)
+		{
+			return db.Users.Where(xy => (xy.Id != id) && (xy.Email == email)).Any();
+		}
 	}
-
 }

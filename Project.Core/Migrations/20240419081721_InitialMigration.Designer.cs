@@ -12,7 +12,7 @@ using Project.Core.Data;
 namespace Project.Core.Migrations
 {
     [DbContext(typeof(ProjectDbContext))]
-    [Migration("20240123141217_InitialMigration")]
+    [Migration("20240419081721_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -25,6 +25,47 @@ namespace Project.Core.Migrations
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "uuid-ossp");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Project.Core.CustomModels.Category", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<short>("Code")
+                        .HasColumnType("smallint")
+                        .HasColumnName("category_code");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on")
+                        .HasDefaultValueSql("Now()");
+
+                    b.Property<int>("DataState")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("data_state");
+
+                    b.Property<DateTime>("ModifiedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modified_on")
+                        .HasDefaultValueSql("Now()");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("category_name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("category", (string)null);
+                });
 
             modelBuilder.Entity("Project.Core.CustomModels.Order", b =>
                 {
@@ -79,9 +120,9 @@ namespace Project.Core.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<int>("Category")
-                        .HasColumnType("integer")
-                        .HasColumnName("category");
+                    b.Property<long>("CategoryCode")
+                        .HasColumnType("bigint")
+                        .HasColumnName("category_fk_id");
 
                     b.Property<DateTime>("CreatedOn")
                         .ValueGeneratedOnAdd()
@@ -107,6 +148,11 @@ namespace Project.Core.Migrations
                         .HasColumnType("character varying(8129)")
                         .HasColumnName("description");
 
+                    b.Property<string>("ProductImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("ProductImage Url");
+
                     b.Property<string>("ProductName")
                         .IsRequired()
                         .HasColumnType("text")
@@ -121,6 +167,8 @@ namespace Project.Core.Migrations
                         .HasColumnName("user_fk_id");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryCode");
 
                     b.HasIndex("UserFkId");
 
@@ -163,7 +211,6 @@ namespace Project.Core.Migrations
                         .HasColumnName("first_name");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("last_name");
 
@@ -181,10 +228,6 @@ namespace Project.Core.Migrations
                     b.Property<int>("RoleName")
                         .HasColumnType("integer")
                         .HasColumnName("role");
-
-                    b.Property<bool>("termAccept")
-                        .HasColumnType("boolean")
-                        .HasColumnName("terms_accept");
 
                     b.HasKey("Id");
 
@@ -212,11 +255,19 @@ namespace Project.Core.Migrations
 
             modelBuilder.Entity("Project.Core.CustomModels.Product", b =>
                 {
+                    b.HasOne("Project.Core.CustomModels.Category", "CategoryById")
+                        .WithMany()
+                        .HasForeignKey("CategoryCode")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Project.Core.CustomModels.Register", "register")
                         .WithMany()
                         .HasForeignKey("UserFkId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CategoryById");
 
                     b.Navigation("register");
                 });

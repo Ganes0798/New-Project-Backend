@@ -17,7 +17,7 @@ namespace MigrationTool
             try
             {
                 Console.WriteLine("----------------------");
-                Console.WriteLine("--IMS Migration Tool--");
+                Console.WriteLine("--EHouse Migration Tool--");
                 Console.WriteLine("----------------------");
 
                 bool seed = false;

@@ -26,6 +26,7 @@ namespace Project.Core.Data
 
         public DbSet<Product> Products { get; set; }
 
+        public DbSet<Category> categories { get; set; }
         public DbSet<Order> Orders { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -50,7 +51,6 @@ namespace Project.Core.Data
 				entity.Property(e => e.Password).HasColumnName("user_pass");
                 entity.Property(e => e.Email).HasColumnName("email_id");
                 entity.Property(e => e.RoleName).HasColumnName("role");
-                entity.Property(e => e.termAccept).HasColumnName("terms_accept");
                 entity.Property(e => e.CreatedOn).HasColumnName(CommonNames.CreatedOn).HasDefaultValueSql(CommonNames.NOW);
                 entity.Property(e => e.ModifiedOn).HasColumnName(CommonNames.ModifiedOn).HasDefaultValueSql(CommonNames.NOW);
 				entity.Property(e => e.DataState).HasColumnName(CommonNames.DataState).HasDefaultValue(RecordState.Active);
@@ -63,10 +63,22 @@ namespace Project.Core.Data
                 entity.Property(e => e.ProductName).HasColumnName("name");
                 entity.Property(e => e.UserFkId).HasColumnName(CommonNames.UserFkId);
                 entity.Property(e => e.ProductDescription).HasColumnName("description").HasMaxLength(8129);
+                entity.Property(e => e.ProductImageUrl).HasColumnName("ProductImage Url");
                 entity.Property(e => e.ProductQuantity).HasColumnName("quantity");
-                entity.Property(e => e.Category).HasColumnName("category");
+                entity.Property(e => e.CategoryCode).HasColumnName("category_fk_id");
 				entity.Property(e => e.CreatedOn).HasColumnName(CommonNames.CreatedOn).HasDefaultValueSql(CommonNames.NOW);
 				entity.Property(e => e.ModifiedOn).HasColumnName(CommonNames.ModifiedOn).HasDefaultValueSql(CommonNames.NOW);
+				entity.Property(e => e.DataState).HasColumnName(CommonNames.DataState).HasDefaultValue(RecordState.Active);
+			});
+
+            modelBuilder.Entity<Category>(entity =>
+            {
+                entity.ToTable(CommonNames.Category);
+                entity.Property(e => e.Id).HasColumnName(CommonNames.Id);
+                entity.Property(e => e.Name).HasColumnName("category_name");
+                entity.Property(e => e.Code).HasColumnName("category_code");
+                entity.Property(e => e.CreatedOn).HasColumnName(CommonNames.CreatedOn).HasDefaultValueSql(CommonNames.NOW);
+                entity.Property(e => e.ModifiedOn).HasColumnName(CommonNames.ModifiedOn).HasDefaultValueSql(CommonNames.NOW);
 				entity.Property(e => e.DataState).HasColumnName(CommonNames.DataState).HasDefaultValue(RecordState.Active);
 			});
 

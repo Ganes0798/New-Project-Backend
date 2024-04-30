@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using New_Project_Backend.Model;
 using Project.Core.CustomModels;
 using Project.Core.Data;
+using Project.Core.Enums;
 
 namespace New_Project_Backend.Controllers
 {
@@ -18,10 +20,9 @@ namespace New_Project_Backend.Controllers
 
 
 
-
-        [Authorize("Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
-        public ActionResult Add([FromBody] Product _product)
+        public ActionResult Add([FromBody] CreateProduct _product)
         {
             try
             {
@@ -33,7 +34,8 @@ namespace New_Project_Backend.Controllers
                         ProductDescription = _product.ProductDescription,
                         ProductQuantity = _product.ProductQuantity,
                         UserFkId = _product.UserFkId,
-                        Category = _product.Category
+                        CategoryCode = _product.CategoryCode
+                        
                     };
 
                     using (var transaction = dbcontext.Database.BeginTransaction())
@@ -64,6 +66,50 @@ namespace New_Project_Backend.Controllers
                 throw;
             }
         }
+
+		[Authorize(Roles = "Admin")]
+		[HttpPatch]
+        public ActionResult update([FromBody] Product _modifyProduct)
+        {
+            var _userDetails = GetCurrentUserDetail();
+			try
+            {
+
+				using (ExtendedProjectDbContext dbContext = new ExtendedProjectDbContext(c_config))
+                {
+					var _existProduct = GetProductDetails(dbContext, _modifyProduct.Id);
+
+					_existProduct.ProductName = _modifyProduct.ProductName;
+                    _existProduct.ProductDescription = _modifyProduct.ProductDescription;
+                    _existProduct.ProductQuantity = _modifyProduct.ProductQuantity;
+                    _existProduct.CategoryCode = _modifyProduct.CategoryCode;
+                    _existProduct.UserFkId = _modifyProduct.UserFkId;
+
+                    using(var transaction = dbContext.Database.BeginTransaction())
+                    {
+                        try
+                        {
+                            dbContext.Entry(_existProduct).State = EntityState.Modified;
+                            dbContext.SaveChanges();
+                            transaction.Commit();
+                        }
+                        catch(Exception)
+                        {
+                            transaction.Rollback();
+                            throw;
+                        }
+                    }
+                    return SendSuccessMessage(ErrorCodes.ProductsAddedSuccessfully);
+                }
+            }
+            catch(Exception)
+            {
+                throw;
+            }
+        }
+
+       
+
 
     }
 }

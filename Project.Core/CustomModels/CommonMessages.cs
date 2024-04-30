@@ -31,6 +31,9 @@ namespace Project.Core.CustomModels
 		EmptyUsers,
         ProductsAddedSuccessfully,
 		PasswordMismatch,
-		PasswordUpdatedSuccessfully
+		PasswordUpdatedSuccessfully,
+        CheckThePasswords,
+        OrderPlacedSuccessfully,
+        EmptyOrderList
 	}
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -39,13 +40,15 @@ namespace Project.Core.CustomModels
 		[Required]
 		public string FirstName { get; set; } = string.Empty;
 
-		public string LastName { get; set; } = string.Empty;
+		[AllowNull]
+		public string? LastName { get; set; } = string.Empty;
 
         [Required]
 		[DataType(DataType.Password)]
 		public string Password { get; set; } = string.Empty;
 
-		[JsonIgnore]
+		[Required]
+		[DataType(DataType.Password)]
 		public string ConfirmPassword { get; set; } = string.Empty;
 
 		[Required]
@@ -54,9 +57,6 @@ namespace Project.Core.CustomModels
 
 		[Required]
 		public Roles RoleName { get; set; }
-
-
-		public bool termAccept { get; set; }
 	}
 
 	public class Login
@@ -71,8 +71,6 @@ namespace Project.Core.CustomModels
 		[Display(Name = "password", Description = "Enter Valid Password")]
 		[JsonPropertyName("password")]
 		public string Password { get; set; } = string.Empty;
-		
-		public bool Rememberme { get; set; }
 	}
 
 	public class chngePwd
@@ -89,20 +87,34 @@ namespace Project.Core.CustomModels
 		[Key]
 		public long Id { get; set; }
 
+
 		[ForeignKey("UserFkId")]
 		public Register register { get; set; }
 
 		
 		public long UserFkId { get; set; }
+
+
 		public string ProductName { get; set; } = string.Empty;
 
 		public string ProductDescription { get; set; } = string.Empty;
 
+		public string ProductImageUrl { get; set; } = string.Empty;
+
 		public int ProductQuantity { get; set; }
 
-		public Category Category { get; set; }
+		[ForeignKey("CategoryCode")]
+		public Category CategoryById { get; set; }
 
+		public long CategoryCode { get; set; }
+	}
 
+	public class Category : BaseTable
+	{
+		public long Id { get; set; }
+		public string Name { get; set; }
+
+		public Int16 Code { get; set; }
 	}
 
 	public class Order : BaseTable
@@ -121,5 +133,7 @@ namespace Project.Core.CustomModels
 		public long UserFkId { get; set;}
 	}
 
-	
+
+
+
 }

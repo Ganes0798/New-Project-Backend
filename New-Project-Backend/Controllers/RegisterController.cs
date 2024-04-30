@@ -35,12 +35,11 @@ namespace New_Project_Backend.Controllers
 						return SendErrorMessage(ErrorCodes.UserAlreadyExist);
 					}
 
-					Roles _userRole = Roles.None;
-					Enum.TryParse(register.RoleName.ToString(), true, out _userRole);
-					if (!Enum.IsDefined(typeof(Roles), _userRole))
-					{
-						return SendErrorMessage(ErrorCodes.InvalidEnumRole);
-					}
+					Roles _userRole = Roles.User;
+					//if (!Enum.IsDefined(typeof(Roles), _userRole))
+					//{
+					//	return SendErrorMessage(ErrorCodes.InvalidEnumRole);
+					//}
 
 					var _newUser = new Register()
 					{
@@ -48,25 +47,33 @@ namespace New_Project_Backend.Controllers
 						LastName = register.LastName,
 						Email = register.Email,
 						Password = EncryptDecrypt.EncryptString(register.Password),
+						ConfirmPassword = EncryptDecrypt.EncryptString(register.ConfirmPassword),
 						RoleName = _userRole,
 					};
-
-					using (var transaction = dbContext.Database.BeginTransaction())
+					if(register.ConfirmPassword == register.Password)
 					{
-						try
+						using (var transaction = dbContext.Database.BeginTransaction())
 						{
-							dbContext.Users.Add(_newUser);
-							dbContext.SaveChanges();
-							transaction.Commit();
+							try
+							{
+								dbContext.Users.Add(_newUser);
+								dbContext.SaveChanges();
+								transaction.Commit();
+							}
+							catch (Exception)
+							{
+								transaction.Rollback();
+								throw;
+							}
 						}
-						catch (Exception)
-						{
-							transaction.Rollback();
-							throw;
-						}
-					}
 
-					return SendSuccessMessage(ErrorCodes.NewUserAddedSuccessFully);
+						return SendSuccessMessage(ErrorCodes.NewUserAddedSuccessFully);
+					}
+					else
+					{
+						return SendErrorMessage(ErrorCodes.CheckThePasswords);
+					}
+					
 					//return Ok(new ResponseBodyResource<Users>()
 					//{
 					//    Result = _newUser

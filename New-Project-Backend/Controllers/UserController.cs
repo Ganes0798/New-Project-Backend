@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Win32;
 using New_Project_Backend.Model;
 using Project.Core.CustomModels;
 using Project.Core.Data;
@@ -25,8 +26,7 @@ namespace New_Project_Backend.Controllers
         public ActionResult Get([FromQuery] long? id)
         {
             var UserDetails = GetCurrentUserDetail();
-            Roles _userRole = Roles.None;
-			Enum.TryParse(UserDetails.RoleName.ToString(), true, out _userRole);
+			
 
 			List<Roles> filterRole = new List<Roles>() { Roles.User };
 			using (ExtendedProjectDbContext dbcontext = new ExtendedProjectDbContext(c_config))
@@ -40,7 +40,7 @@ namespace New_Project_Backend.Controllers
                                                                      FirstName = xy.FirstName,
                                                                      LastName = xy.LastName,
                                                                      Email = xy.Email,
-                                                                     UserRole = xy.RoleName,
+                                                                     UserRole = xy.RoleName.ToString(),
                                                                      ModifiedOn = xy.ModifiedOn
                                                                  }).ToList();
 
@@ -69,6 +69,64 @@ namespace New_Project_Backend.Controllers
 
 			}
         }
+
+		[HttpPost]
+		public ActionResult addUsers([FromBody] CreateUsers _users)
+		{
+			try
+			{
+				using(ExtendedProjectDbContext dbContext = new ExtendedProjectDbContext(c_config))
+				{
+					if (IsEmailExists(dbContext, _users.Email, 0))
+					{
+						return SendErrorMessage(ErrorCodes.UserAlreadyExist);
+					}
+
+					Roles _userRole = Roles.User;
+					var _newUsers = new Register()
+					{
+						FirstName = _users.FirstName,
+						LastName = _users.LastName,
+						Email = _users.Email,
+						Password = EncryptDecrypt.EncryptString(_users.Password),
+						ConfirmPassword = EncryptDecrypt.EncryptString(_users.ConfirmPassword),
+						RoleName = _userRole,
+					};
+
+					if (_users.ConfirmPassword == _users.Password)
+					{
+						using (var transaction = dbContext.Database.BeginTransaction())
+						{
+							try
+							{
+								dbContext.Users.Add(_newUsers);
+								dbContext.SaveChanges();
+								transaction.Commit();
+
+								return Ok (new ResponseBodyResource<Register>(){
+									Message = ErrorCodes.NewUserAddedSuccessFully.ToString(),
+									Result = _newUsers
+								});
+							}
+							catch (Exception)
+							{
+								transaction.Rollback();
+								throw;
+							}
+						}
+
+					}
+					else
+					{
+						return SendErrorMessage(ErrorCodes.CheckThePasswords);
+					}
+				}
+			}
+			catch(Exception)
+			{
+				throw;
+			}
+		}
 
 		[HttpPatch("Password")]
 		public ActionResult ChangePassword([FromBody] chngePwd _request)
@@ -123,6 +181,10 @@ namespace New_Project_Backend.Controllers
 			}
 		}
 
+		private bool IsEmailExists(ProjectDbContext db, string email, int id)
+		{
+			return db.Users.Where(xy => (xy.Id != id) && (xy.Email == email)).Any();
+		}
 
 
 	}

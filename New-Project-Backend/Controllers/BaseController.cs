@@ -39,6 +39,12 @@ namespace New_Project_Backend.Controllers
 												(xy.Id == id))).FirstOrDefault();
 		}
 
+		protected Product GetProductDetails(ExtendedProjectDbContext dbContext, long id)
+		{
+			return dbContext.Products.Where(xy => ((xy.DataState == RecordState.Active) &&
+												(xy.Id == id))).FirstOrDefault();
+		}
+
 
 		protected ObjectResult SendErrorMessage(ErrorCodes errorCode)
 		{

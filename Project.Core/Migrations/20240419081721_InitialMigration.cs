@@ -16,18 +16,34 @@ namespace Project.Core.Migrations
                 .Annotation("Npgsql:PostgresExtension:uuid-ossp", ",,");
 
             migrationBuilder.CreateTable(
+                name: "category",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    category_name = table.Column<string>(type: "text", nullable: false),
+                    category_code = table.Column<short>(type: "smallint", nullable: false),
+                    created_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "Now()"),
+                    modified_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "Now()"),
+                    data_state = table.Column<int>(type: "integer", nullable: false, defaultValue: 1)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_category", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "user",
                 columns: table => new
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     first_name = table.Column<string>(type: "text", nullable: false),
-                    last_name = table.Column<string>(type: "text", nullable: false),
+                    last_name = table.Column<string>(type: "text", nullable: true),
                     user_pass = table.Column<string>(type: "text", nullable: false),
                     ConfirmPassword = table.Column<string>(type: "text", nullable: false),
                     email_id = table.Column<string>(type: "text", nullable: false),
                     role = table.Column<int>(type: "integer", nullable: false),
-                    terms_accept = table.Column<bool>(type: "boolean", nullable: false),
                     created_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "Now()"),
                     modified_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "Now()"),
                     data_state = table.Column<int>(type: "integer", nullable: false, defaultValue: 1)
@@ -46,8 +62,9 @@ namespace Project.Core.Migrations
                     user_fk_id = table.Column<long>(type: "bigint", nullable: false),
                     name = table.Column<string>(type: "text", nullable: false),
                     description = table.Column<string>(type: "character varying(8129)", maxLength: 8129, nullable: false),
+                    ProductImageUrl = table.Column<string>(name: "ProductImage Url", type: "text", nullable: false),
                     quantity = table.Column<int>(type: "integer", nullable: false),
-                    category = table.Column<int>(type: "integer", nullable: false),
+                    category_fk_id = table.Column<long>(type: "bigint", nullable: false),
                     created_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "Now()"),
                     modified_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "Now()"),
                     data_state = table.Column<int>(type: "integer", nullable: false, defaultValue: 1)
@@ -55,6 +72,12 @@ namespace Project.Core.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_products", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_products_category_category_fk_id",
+                        column: x => x.category_fk_id,
+                        principalTable: "category",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_products_user_user_fk_id",
                         column: x => x.user_fk_id,
@@ -103,6 +126,11 @@ namespace Project.Core.Migrations
                 column: "user_fk_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_products_category_fk_id",
+                table: "products",
+                column: "category_fk_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_products_user_fk_id",
                 table: "products",
                 column: "user_fk_id");
@@ -116,6 +144,9 @@ namespace Project.Core.Migrations
 
             migrationBuilder.DropTable(
                 name: "products");
+
+            migrationBuilder.DropTable(
+                name: "category");
 
             migrationBuilder.DropTable(
                 name: "user");
