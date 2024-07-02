@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using New_Project_Backend.Model;
 using Project.Core.CustomModels;
 using Project.Core.Data;
@@ -6,6 +7,7 @@ using static Project.Core.Enums.CommonEnums;
 
 namespace New_Project_Backend.Controllers
 {
+	[EnableCors("_allowOriginPolicy")]
 	[Route("api/[controller]")]
 	[ApiController]
 	public class OrderController : BaseController
@@ -34,7 +36,7 @@ namespace New_Project_Backend.Controllers
 															  Id = ab.product.Id,
 															  ProductName = ab.product.ProductName,
 															  ProductDescription = ab.product.ProductDescription,
-															  ProductQuantity = ab.product.ProductQuantity
+															  TotalProducts = ab.product.TotalProducts
 														  },
 														  register = new Register()
 														  {

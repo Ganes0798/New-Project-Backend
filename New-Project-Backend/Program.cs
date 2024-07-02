@@ -32,6 +32,7 @@ builder.Services.AddSwaggerGen(options =>
 var config = builder.Configuration;
 
 builder.Services.AddApplicationServices(builder.Configuration);
+
 //Authentications
 
 //builder.Services.AddAuthentication(opt =>
@@ -57,13 +58,12 @@ builder.Services.AddApplicationServices(builder.Configuration);
 //Added Cors For All Websites
 builder.Services.AddCors(options =>
 {
-	options.AddPolicy(name: "CorsPolicy", builder =>
-	{
-		builder.WithOrigins("http://localhost:4200")
-		.AllowAnyHeader()
-		.AllowAnyMethod()
-		.AllowCredentials();
-	});
+	options.AddPolicy(name: "_allowOriginPolicy",
+		policyBuilder => {
+			policyBuilder.SetIsOriginAllowed(_ => true)
+			.AllowCredentials()
+			.AllowAnyMethod().AllowAnyHeader();
+		});
 });
 
 
@@ -76,7 +76,7 @@ if (app.Environment.IsDevelopment())
 	app.UseSwaggerUI();
 }
 
-app.UseCors("CorsPolicy");
+app.UseCors("_allowOriginPolicy");
 
 app.UseHttpsRedirection();
 

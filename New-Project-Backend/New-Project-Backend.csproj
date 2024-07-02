@@ -12,6 +12,7 @@
   <ItemGroup>
     <PackageReference Include="Google.Apis" Version="1.66.0" />
     <PackageReference Include="Google.Apis.Auth" Version="1.66.0" />
+    <PackageReference Include="MailKit" Version="4.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
@@ -31,6 +32,10 @@
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="images\" />
 	</ItemGroup>
 
 </Project>

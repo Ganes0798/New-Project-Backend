@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Win32;
@@ -12,6 +13,7 @@ using static Project.Core.Model.CutomResults;
 
 namespace New_Project_Backend.Controllers
 {
+	[EnableCors("_allowOriginPolicy")]
 	[Route("api/[controller]")]
 	[ApiController]
 	public class UserController : BaseController
@@ -176,6 +178,49 @@ namespace New_Project_Backend.Controllers
 
 			}
 			catch (Exception)
+			{
+				throw;
+			}
+		}
+		[HttpDelete("{id:long}")]
+		public ActionResult Delete(long id)
+		{
+			var _userDetails = GetCurrentUserDetail();
+			try
+			{
+				using (ExtendedProjectDbContext dbContext = new ExtendedProjectDbContext(c_config))
+				{
+					var _existUser = GetProductDetails(dbContext, id);
+					if (_existUser == null)
+					{
+						return SendErrorMessage(ErrorCodes.NoProductsAvailable);
+					}
+
+					_existUser.DataState = RecordState.Deleted;
+					_existUser.ModifiedOn = DateTime.UtcNow;
+
+					using (var transaction = dbContext.Database.BeginTransaction())
+					{
+						try
+						{
+							dbContext.Entry(_existUser).State = EntityState.Modified;
+							dbContext.SaveChanges();
+							transaction.Commit();
+
+							return Ok(new ResponseBodyResource<Product>()
+							{
+								Message = ErrorCodes.UserDeletedSuccessfully.ToString()
+							});
+						}
+						catch (Exception)
+						{
+							transaction.Rollback();
+							throw;
+						}
+					}
+				}
+			}
+			catch (Exception ex)
 			{
 				throw;
 			}

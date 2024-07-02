@@ -45,6 +45,15 @@ namespace New_Project_Backend.Controllers
 												(xy.Id == id))).FirstOrDefault();
 		}
 
+		protected CartDetails GetCartDetails(ExtendedProjectDbContext dbContext, long id)
+		{
+			return dbContext.cart.Where(xy => ((xy.DataState == RecordState.Active) && (xy.Id == id))).FirstOrDefault();
+		}
+		protected LibraryBooks GetLibraryBooksDetails(ExtendedProjectDbContext dbContext, long id)
+		{
+			return dbContext.library.Where(xy => ((xy.DataState == RecordState.Active) && (xy.Id == id))).FirstOrDefault();
+		}
+
 
 		protected ObjectResult SendErrorMessage(ErrorCodes errorCode)
 		{

@@ -27,7 +27,13 @@ namespace Project.Core.Data
         public DbSet<Product> Products { get; set; }
 
         public DbSet<Category> categories { get; set; }
+
+        public DbSet<CartDetails> cart { get; set; }
         public DbSet<Order> Orders { get; set; }
+
+        public DbSet<LibraryBooks> library { get; set; }
+
+        public DbSet<FormData> formdata { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -61,10 +67,10 @@ namespace Project.Core.Data
                 entity.ToTable(CommonNames.Product);
                 entity.Property(e => e.Id).HasColumnName(CommonNames.Id);
                 entity.Property(e => e.ProductName).HasColumnName("name");
-                entity.Property(e => e.UserFkId).HasColumnName(CommonNames.UserFkId);
                 entity.Property(e => e.ProductDescription).HasColumnName("description").HasMaxLength(8129);
-                entity.Property(e => e.ProductImageUrl).HasColumnName("ProductImage Url");
-                entity.Property(e => e.ProductQuantity).HasColumnName("quantity");
+                entity.Property(e => e.ProductImageUrl).HasColumnName("image_url");
+                entity.Property(e => e.ProductPrice).HasColumnName("product_price");
+                entity.Property(e => e.TotalProducts).HasColumnName("total_products");
                 entity.Property(e => e.CategoryCode).HasColumnName("category_fk_id");
 				entity.Property(e => e.CreatedOn).HasColumnName(CommonNames.CreatedOn).HasDefaultValueSql(CommonNames.NOW);
 				entity.Property(e => e.ModifiedOn).HasColumnName(CommonNames.ModifiedOn).HasDefaultValueSql(CommonNames.NOW);
@@ -82,19 +88,56 @@ namespace Project.Core.Data
 				entity.Property(e => e.DataState).HasColumnName(CommonNames.DataState).HasDefaultValue(RecordState.Active);
 			});
 
+            modelBuilder.Entity<CartDetails>(entity =>
+            {
+                entity.ToTable(CommonNames.CartDetails);
+                entity.Property(e => e.Id).HasColumnName(CommonNames.Id);
+                entity.Property(e => e.ProductFkId).HasColumnName("product_fk_id");
+                entity.Property(e => e.UserFkId).HasColumnName("user_fk_id");
+                entity.Property(e => e.Quantity).HasColumnName("quantity");
+                entity.Property(e => e.CreatedOn).HasColumnName(CommonNames.CreatedOn).HasDefaultValueSql(CommonNames.NOW);
+                entity.Property(e => e.ModifiedOn).HasColumnName(CommonNames.ModifiedOn).HasDefaultValueSql(CommonNames.NOW);
+                entity.Property(e => e.DataState).HasColumnName(CommonNames.DataState).HasDefaultValue(RecordState.Active);
+            });
+
             modelBuilder.Entity<Order>(entity =>
             {
 				entity.ToTable(CommonNames.Order);
 				entity.Property(e => e.Id).HasColumnName(CommonNames.Id);
 				entity.Property(e => e.UserFkId).HasColumnName(CommonNames.UserFkId);
 				entity.Property(e => e.ProductFkId).HasColumnName(CommonNames.ProductFkId);
+                entity.Property(e => e.ProductQuantity).HasColumnName("product_quantity");
 				entity.Property(e => e.CreatedOn).HasColumnName(CommonNames.CreatedOn).HasDefaultValueSql(CommonNames.NOW);
 				entity.Property(e => e.ModifiedOn).HasColumnName(CommonNames.ModifiedOn).HasDefaultValueSql(CommonNames.NOW);
 				entity.Property(e => e.DataState).HasColumnName(CommonNames.DataState).HasDefaultValue(RecordState.Active);
 			});
 
+			modelBuilder.Entity<LibraryBooks>(entity =>
+			{
+				entity.ToTable("library");
+				entity.Property(e => e.Id).HasColumnName(CommonNames.Id);
+				entity.Property(e => e.BookName).HasColumnName("book_name");
+				entity.Property(e => e.BookAuthor).HasColumnName("author_name");
+				entity.Property(e => e.BookSelfNumber).HasColumnName("book_self_number");
+				entity.Property(e => e.CreatedOn).HasColumnName(CommonNames.CreatedOn).HasDefaultValueSql(CommonNames.NOW);
+				entity.Property(e => e.ModifiedOn).HasColumnName(CommonNames.ModifiedOn).HasDefaultValueSql(CommonNames.NOW);
+				entity.Property(e => e.DataState).HasColumnName(CommonNames.DataState).HasDefaultValue(RecordState.Active);
+			});
 
-            OnModelCreatingPartial(modelBuilder);
+			modelBuilder.Entity<FormData>(entity =>
+            {
+				entity.ToTable("formdata");
+				entity.Property(e => e.Id).HasColumnName(CommonNames.Id);
+				entity.Property(e => e.Name).HasColumnName("person_name");
+				entity.Property(e => e.Email).HasColumnName("person_email");
+				entity.Property(e => e.PhoneNumber).HasColumnName("person_phone");
+				entity.Property(e => e.Description).HasColumnName("person_description");
+				entity.Property(e => e.CreatedOn).HasColumnName(CommonNames.CreatedOn).HasDefaultValueSql(CommonNames.NOW);
+				entity.Property(e => e.ModifiedOn).HasColumnName(CommonNames.ModifiedOn).HasDefaultValueSql(CommonNames.NOW);
+				entity.Property(e => e.DataState).HasColumnName(CommonNames.DataState).HasDefaultValue(RecordState.Active);
+			});
+
+			OnModelCreatingPartial(modelBuilder);
         }
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }

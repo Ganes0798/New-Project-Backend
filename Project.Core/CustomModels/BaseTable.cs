@@ -27,6 +27,7 @@ namespace Project.Core.CustomModels
 
 	public class BaseTable : BaseTableModified
 	{
+
 		[JsonIgnore]
 		public RecordState DataState { get; set; }
 	}
@@ -87,21 +88,14 @@ namespace Project.Core.CustomModels
 		[Key]
 		public long Id { get; set; }
 
-
-		[ForeignKey("UserFkId")]
-		public Register register { get; set; }
-
-		
-		public long UserFkId { get; set; }
-
-
 		public string ProductName { get; set; } = string.Empty;
 
 		public string ProductDescription { get; set; } = string.Empty;
 
 		public string ProductImageUrl { get; set; } = string.Empty;
 
-		public int ProductQuantity { get; set; }
+		public long ProductPrice { get; set; }
+		public int TotalProducts { get; set; }
 
 		[ForeignKey("CategoryCode")]
 		public Category CategoryById { get; set; }
@@ -117,6 +111,23 @@ namespace Project.Core.CustomModels
 		public Int16 Code { get; set; }
 	}
 
+	public class CartDetails: BaseTable
+	{
+		public long Id { get; set; }
+
+		[ForeignKey("UserFkId")]
+		public Register User { get; set; }
+
+		public long UserFkId { get; set; }
+
+		[ForeignKey("ProductFkId")]
+		public Product Product { get; set; }
+
+		public long ProductFkId { get; set; }
+
+		public long Quantity { get; set; }
+
+	}
 	public class Order : BaseTable
 	{
 		[Key]
@@ -131,8 +142,49 @@ namespace Project.Core.CustomModels
 		public Register register { get; set; } 
 
 		public long UserFkId { get; set;}
+
+		public int ProductQuantity { get; set; }
 	}
 
+
+	public class LibraryBooks : BaseTable
+	{
+		public long Id { get; set; }
+
+		public string BookName { get; set; }
+
+		public string BookAuthor { get; set; }
+
+		public string BookSelfNumber { get; set; }
+
+		public string LibraryHandlerName { get; set; }
+	}
+
+	public class FormData : BaseTable
+	{
+		public long Id { get; set; }
+
+		public string Name { get; set; }
+
+		public string Email { get; set; }
+
+		public string PhoneNumber { get; set; }
+
+		public string Description { get; set; }
+
+
+	}
+
+
+	public class EmailModel
+	{
+		public string Email { get; set; }
+		public string? Name { get; set; }
+
+		public string? PhoneNumber { get; set; }
+
+		public string? Description { get; set; }
+	}
 
 
 

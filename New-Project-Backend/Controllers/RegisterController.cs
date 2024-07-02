@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using New_Project_Backend.Extensions;
@@ -11,6 +12,7 @@ using static Project.Core.Enums.CommonEnums;
 
 namespace New_Project_Backend.Controllers
 {
+	[EnableCors("_allowOriginPolicy")]
 	[Route("api/[controller]")]
 	[ApiController]
 	public class RegisterController : BaseController
