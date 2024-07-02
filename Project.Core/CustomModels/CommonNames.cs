@@ -10,6 +10,7 @@ namespace Project.Core.CustomModels
     {
         public const string Register = "user";
         public const string Product = "products";
+        public const string CartDetails = "cart";
         public const string Category = "category";
 		public const string Order = "order";
 		public const string UserFkId = "user_fk_id";

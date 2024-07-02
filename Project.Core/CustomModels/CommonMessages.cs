@@ -30,10 +30,20 @@ namespace Project.Core.CustomModels
 		UserAlreadyExist,
 		EmptyUsers,
         ProductsAddedSuccessfully,
+		ProductUpdatedSuccessfully,
 		PasswordMismatch,
 		PasswordUpdatedSuccessfully,
         CheckThePasswords,
         OrderPlacedSuccessfully,
-        EmptyOrderList
+        EmptyOrderList,
+		NoProductsAvailable,
+        ProductDeletedSuccessfully,
+        UserDeletedSuccessfully,
+        CartAddedSuccessfully,
+        NoLibraryBooksAvailable,
+        BookAddedSuccessfully,
+		BooksUpdatedSuccessfully,
+        BookDeletedSuccessfully
+
 	}
 }

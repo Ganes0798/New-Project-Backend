@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace Project.Core.CustomModels
 {
-   //public enum ActiveRoles
-   // {
-   //     None = 0,
-   //     SuperAdmin,
-   //     Admin,
-   //     User
-   // }
+   public enum SearchFields
+	{
+		None = 0,
+		FirstName,
+		LastName,
+		ProductName,
+		Category,
+
+	}
 }

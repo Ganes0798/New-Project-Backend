@@ -23,6 +23,54 @@ namespace Project.Core.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "uuid-ossp");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Project.Core.CustomModels.CartDetails", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on")
+                        .HasDefaultValueSql("Now()");
+
+                    b.Property<int>("DataState")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("data_state");
+
+                    b.Property<DateTime>("ModifiedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modified_on")
+                        .HasDefaultValueSql("Now()");
+
+                    b.Property<long>("ProductFkId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("product_fk_id");
+
+                    b.Property<long>("Quantity")
+                        .HasColumnType("bigint")
+                        .HasColumnName("quantity");
+
+                    b.Property<long>("UserFkId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("user_fk_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductFkId");
+
+                    b.HasIndex("UserFkId");
+
+                    b.ToTable("cart", (string)null);
+                });
+
             modelBuilder.Entity("Project.Core.CustomModels.Category", b =>
                 {
                     b.Property<long>("Id")
@@ -64,6 +112,109 @@ namespace Project.Core.Migrations
                     b.ToTable("category", (string)null);
                 });
 
+            modelBuilder.Entity("Project.Core.CustomModels.FormData", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on")
+                        .HasDefaultValueSql("Now()");
+
+                    b.Property<int>("DataState")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("data_state");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("person_description");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("person_email");
+
+                    b.Property<DateTime>("ModifiedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modified_on")
+                        .HasDefaultValueSql("Now()");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("person_name");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("person_phone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("formdata", (string)null);
+                });
+
+            modelBuilder.Entity("Project.Core.CustomModels.LibraryBooks", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("BookAuthor")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("author_name");
+
+                    b.Property<string>("BookName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("book_name");
+
+                    b.Property<string>("BookSelfNumber")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("book_self_number");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on")
+                        .HasDefaultValueSql("Now()");
+
+                    b.Property<int>("DataState")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("data_state");
+
+                    b.Property<string>("LibraryHandlerName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ModifiedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modified_on")
+                        .HasDefaultValueSql("Now()");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("library", (string)null);
+                });
+
             modelBuilder.Entity("Project.Core.CustomModels.Order", b =>
                 {
                     b.Property<long>("Id")
@@ -94,6 +245,10 @@ namespace Project.Core.Migrations
                     b.Property<long>("ProductFkId")
                         .HasColumnType("bigint")
                         .HasColumnName("product_fk_id");
+
+                    b.Property<int>("ProductQuantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("product_quantity");
 
                     b.Property<long>("UserFkId")
                         .HasColumnType("bigint")
@@ -148,26 +303,24 @@ namespace Project.Core.Migrations
                     b.Property<string>("ProductImageUrl")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("ProductImage Url");
+                        .HasColumnName("image_url");
 
                     b.Property<string>("ProductName")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.Property<int>("ProductQuantity")
-                        .HasColumnType("integer")
-                        .HasColumnName("quantity");
-
-                    b.Property<long>("UserFkId")
+                    b.Property<long>("ProductPrice")
                         .HasColumnType("bigint")
-                        .HasColumnName("user_fk_id");
+                        .HasColumnName("product_price");
+
+                    b.Property<int>("TotalProducts")
+                        .HasColumnType("integer")
+                        .HasColumnName("total_products");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryCode");
-
-                    b.HasIndex("UserFkId");
 
                     b.ToTable("products", (string)null);
                 });
@@ -231,6 +384,25 @@ namespace Project.Core.Migrations
                     b.ToTable("user", (string)null);
                 });
 
+            modelBuilder.Entity("Project.Core.CustomModels.CartDetails", b =>
+                {
+                    b.HasOne("Project.Core.CustomModels.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductFkId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Project.Core.CustomModels.Register", "User")
+                        .WithMany()
+                        .HasForeignKey("UserFkId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Project.Core.CustomModels.Order", b =>
                 {
                     b.HasOne("Project.Core.CustomModels.Product", "product")
@@ -258,15 +430,7 @@ namespace Project.Core.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Project.Core.CustomModels.Register", "register")
-                        .WithMany()
-                        .HasForeignKey("UserFkId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("CategoryById");
-
-                    b.Navigation("register");
                 });
 #pragma warning restore 612, 618
         }

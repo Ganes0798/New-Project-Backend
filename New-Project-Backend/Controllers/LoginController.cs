@@ -15,10 +15,12 @@ using Project.Core.Interface;
 using static Project.Core.Enums.CommonEnums;
 using Google.Apis.Auth;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Cors;
 
 
 namespace New_Project_Backend.Controllers
 {
+	[EnableCors("_allowOriginPolicy")]
 	[Route("api/[controller]")]
 	[ApiController]
 	public class LoginController : ControllerBase
