@@ -38,10 +38,6 @@ namespace New_Project_Backend.Controllers
 					}
 
 					Roles _userRole = Roles.User;
-					//if (!Enum.IsDefined(typeof(Roles), _userRole))
-					//{
-					//	return SendErrorMessage(ErrorCodes.InvalidEnumRole);
-					//}
 
 					var _newUser = new Register()
 					{
@@ -89,7 +85,65 @@ namespace New_Project_Backend.Controllers
 
 		}
 
-		private bool IsEmailExists(ProjectDbContext db, string email, int id)
+
+		[HttpPost("Admin")]
+        public IActionResult AddAsAdmin([FromBody] Register register)
+        {
+
+            var _userDetails = GetCurrentUserDetail();
+            try
+            {
+                using (ExtendedProjectDbContext dbContext = new ExtendedProjectDbContext(c_config))
+                {
+                    if (IsEmailExists(dbContext, register.Email, 0))
+                    {
+                        return SendErrorMessage(ErrorCodes.UserAlreadyExist);
+                    }
+
+                    Roles _userRole = Roles.Admin;
+
+                    var _newUser = new Register()
+                    {
+                        FirstName = register.FirstName,
+                        LastName = register.LastName,
+                        Email = register.Email,
+                        Password = EncryptDecrypt.EncryptString(register.Password),
+                        ConfirmPassword = EncryptDecrypt.EncryptString(register.ConfirmPassword),
+                        RoleName = _userRole,
+                    };
+                    if (register.ConfirmPassword == register.Password)
+                    {
+                        using (var transaction = dbContext.Database.BeginTransaction())
+                        {
+                            try
+                            {
+                                dbContext.Users.Add(_newUser);
+                                dbContext.SaveChanges();
+                                transaction.Commit();
+                            }
+                            catch (Exception)
+                            {
+                                transaction.Rollback();
+                                throw;
+                            }
+                        }
+
+                        return SendSuccessMessage(ErrorCodes.NewUserAddedSuccessFully);
+                    }
+                    else
+                    {
+                        return SendErrorMessage(ErrorCodes.CheckThePasswords);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
+        }
+
+        private bool IsEmailExists(ProjectDbContext db, string email, int id)
 		{
 			return db.Users.Where(xy => (xy.Id != id) && (xy.Email == email)).Any();
 		}

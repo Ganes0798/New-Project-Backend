@@ -31,10 +31,6 @@ namespace Project.Core.Data
         public DbSet<CartDetails> cart { get; set; }
         public DbSet<Order> Orders { get; set; }
 
-        public DbSet<LibraryBooks> library { get; set; }
-
-        public DbSet<FormData> formdata { get; set; }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -111,32 +107,6 @@ namespace Project.Core.Data
 				entity.Property(e => e.ModifiedOn).HasColumnName(CommonNames.ModifiedOn).HasDefaultValueSql(CommonNames.NOW);
 				entity.Property(e => e.DataState).HasColumnName(CommonNames.DataState).HasDefaultValue(RecordState.Active);
 			});
-
-			modelBuilder.Entity<LibraryBooks>(entity =>
-			{
-				entity.ToTable("library");
-				entity.Property(e => e.Id).HasColumnName(CommonNames.Id);
-				entity.Property(e => e.BookName).HasColumnName("book_name");
-				entity.Property(e => e.BookAuthor).HasColumnName("author_name");
-				entity.Property(e => e.BookSelfNumber).HasColumnName("book_self_number");
-				entity.Property(e => e.CreatedOn).HasColumnName(CommonNames.CreatedOn).HasDefaultValueSql(CommonNames.NOW);
-				entity.Property(e => e.ModifiedOn).HasColumnName(CommonNames.ModifiedOn).HasDefaultValueSql(CommonNames.NOW);
-				entity.Property(e => e.DataState).HasColumnName(CommonNames.DataState).HasDefaultValue(RecordState.Active);
-			});
-
-			modelBuilder.Entity<FormData>(entity =>
-            {
-				entity.ToTable("formdata");
-				entity.Property(e => e.Id).HasColumnName(CommonNames.Id);
-				entity.Property(e => e.Name).HasColumnName("person_name");
-				entity.Property(e => e.Email).HasColumnName("person_email");
-				entity.Property(e => e.PhoneNumber).HasColumnName("person_phone");
-				entity.Property(e => e.Description).HasColumnName("person_description");
-				entity.Property(e => e.CreatedOn).HasColumnName(CommonNames.CreatedOn).HasDefaultValueSql(CommonNames.NOW);
-				entity.Property(e => e.ModifiedOn).HasColumnName(CommonNames.ModifiedOn).HasDefaultValueSql(CommonNames.NOW);
-				entity.Property(e => e.DataState).HasColumnName(CommonNames.DataState).HasDefaultValue(RecordState.Active);
-			});
-
 			OnModelCreatingPartial(modelBuilder);
         }
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

@@ -28,7 +28,7 @@ namespace New_Project_Backend.Service
 					new Claim(ClaimTypes.Role, userDetails.RoleName.ToString()),
 					new Claim(ClaimTypes.Name, userDetails.UserName),
 				}),
-				Expires = DateTime.UtcNow.AddDays(10),
+				Expires = DateTime.UtcNow.AddHours(2),
 				SigningCredentials = creds,
 				Issuer = _config["JWT:Issuer"],
 				Audience = _config["JWT:Audience"]

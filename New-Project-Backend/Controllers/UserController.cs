@@ -84,7 +84,7 @@ namespace New_Project_Backend.Controllers
 						return SendErrorMessage(ErrorCodes.UserAlreadyExist);
 					}
 
-					Roles _userRole = Roles.User;
+					Roles _userRole = Roles.Admin;
 					var _newUsers = new Register()
 					{
 						FirstName = _users.FirstName,

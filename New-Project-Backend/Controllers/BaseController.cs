@@ -49,10 +49,10 @@ namespace New_Project_Backend.Controllers
 		{
 			return dbContext.cart.Where(xy => ((xy.DataState == RecordState.Active) && (xy.Id == id))).FirstOrDefault();
 		}
-		protected LibraryBooks GetLibraryBooksDetails(ExtendedProjectDbContext dbContext, long id)
-		{
-			return dbContext.library.Where(xy => ((xy.DataState == RecordState.Active) && (xy.Id == id))).FirstOrDefault();
-		}
+		//protected LibraryBooks GetLibraryBooksDetails(ExtendedProjectDbContext dbContext, long id)
+		//{
+		//	return dbContext.library.Where(xy => ((xy.DataState == RecordState.Active) && (xy.Id == id))).FirstOrDefault();
+		//}
 
 
 		protected ObjectResult SendErrorMessage(ErrorCodes errorCode)

@@ -33,44 +33,6 @@ namespace Project.Core.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "formdata",
-                columns: table => new
-                {
-                    id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    person_name = table.Column<string>(type: "text", nullable: false),
-                    person_email = table.Column<string>(type: "text", nullable: false),
-                    person_phone = table.Column<string>(type: "text", nullable: false),
-                    person_description = table.Column<string>(type: "text", nullable: false),
-                    created_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "Now()"),
-                    modified_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "Now()"),
-                    data_state = table.Column<int>(type: "integer", nullable: false, defaultValue: 1)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_formdata", x => x.id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "library",
-                columns: table => new
-                {
-                    id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    book_name = table.Column<string>(type: "text", nullable: false),
-                    author_name = table.Column<string>(type: "text", nullable: false),
-                    book_self_number = table.Column<string>(type: "text", nullable: false),
-                    LibraryHandlerName = table.Column<string>(type: "text", nullable: false),
-                    created_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "Now()"),
-                    modified_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "Now()"),
-                    data_state = table.Column<int>(type: "integer", nullable: false, defaultValue: 1)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_library", x => x.id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "user",
                 columns: table => new
                 {
@@ -209,12 +171,6 @@ namespace Project.Core.Migrations
         {
             migrationBuilder.DropTable(
                 name: "cart");
-
-            migrationBuilder.DropTable(
-                name: "formdata");
-
-            migrationBuilder.DropTable(
-                name: "library");
 
             migrationBuilder.DropTable(
                 name: "order");

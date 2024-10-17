@@ -70,18 +70,6 @@ namespace Project.Core.CustomModels
 		public long UserFkId { get; set; }
 	}
 
-	public class CreateLibraryBooks : BaseTable
-	{
-		public long Id { get; set; }
-		public string BookName { get; set; }
-
-		public string BookAuthor { get; set; }
-
-		public string BookSelfNumber { get; set; }
-
-		public string LibraryHandlerName { get; set; }
-	}
-
 	public class SearchRequest
 	{
 		[JsonPropertyName("searchValue")]
@@ -89,19 +77,5 @@ namespace Project.Core.CustomModels
 
 		[JsonPropertyName("searchField")]
 		public SearchFields FieldName { get; set; }
-	}
-
-	public class CreateFormData : BaseTable
-	{
-
-		public string Name { get; set; }
-
-		public string Email { get; set; }
-
-		public string PhoneNumber { get; set; }
-
-		public string Description { get; set; }
-
-
 	}
 }

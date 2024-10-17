@@ -2,57 +2,104 @@
 using Microsoft.AspNetCore.Mvc;
 using New_Project_Backend.Model;
 using Project.Core.CustomModels;
+using System;
+using System.IO;
 using System.Net;
 using System.Net.Mail;
 
 namespace New_Project_Backend.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
+    public class EmailController : ControllerBase
+    {
+        [HttpPost]
+        [Route("sendemail")]
+        public IActionResult SendEmail(EmailModel model)
+        {
+            try
+            {
+                // Configure SMTP client
+                using (var client = new SmtpClient("smtp.gmail.com", 587))
+                {
+                    string filePath = "C:\\Users\\mgmga\\New-Project-Backend\\New-Project-Backend\\email temp\\email.html";
+                    string mailText = System.IO.File.ReadAllText(filePath);
 
-	[ApiController]
-	[Route("api/[controller]")]
-	public class EmailController : ControllerBase
-	{
-		[HttpPost]
-		[Route("sendemail")]
-		public ActionResult SendEmail(EmailModel model)
-		{
-			try
-			{
-				// Configure SMTP client
-				using (var client = new SmtpClient("smtp.gmail.com", 587))
-				{
-					string FilePath = "C:\\Users\\Mohan_Lalitha\\source\\repos\\New-Project-Backend\\New-Project-Backend\\email temp\\email.html";
-					StreamReader str = new StreamReader(FilePath);
-					string MailText = str.ReadToEnd();
-					str.Close(); 
+                    mailText = mailText.Replace("{{name}}", model.Name)
+                                       .Replace("{{email}}", model.Email);
 
-					MailText = MailText.Replace("{{name}}", model.Name);
-					MailText = MailText.Replace("{{email}}", model.Email);
-					MailText = MailText.Replace("{{phonenumber}}", model.PhoneNumber);
-					MailText = MailText.Replace("{{description}}", model.Description);
+                    client.EnableSsl = true;
+                    client.Credentials = new NetworkCredential("mganesh120798@gmail.com", "gmci zafc snpj sjac");
 
-					client.EnableSsl = true;
-					client.Credentials = new NetworkCredential("mganesh120798@gmail.com", "arvp sber ydgt pncw");
-					
-					// Create message
-					var mailMessage = new MailMessage();
-					mailMessage.IsBodyHtml = true;
-					mailMessage.From = new MailAddress("mganesh120798@gmail.com");
-					mailMessage.To.Add(model.Email);
-					mailMessage.Subject = "Form SuccessFully Submitted";
-					mailMessage.Body = MailText;
+                    // Create message
+                    var mailMessage = new MailMessage
+                    {
+                        IsBodyHtml = true,
+                        From = new MailAddress("mganesh120798@gmail.com"),
+                        Subject = "Form Successfully Submitted",
+                        Body = mailText
+                    };
 
-					// Send email
-					client.Send(mailMessage);
-				}
+                    mailMessage.To.Add(model.Email);
 
-				return Ok("Email Sent Successfully");
-			}
-			catch (Exception ex)
-			{
-				// Log the exception or handle it as per your application's needs
-				throw;
-			}
-		}
-	}
+                    // Send email
+                    client.Send(mailMessage);
+                }
+
+                return Ok("Email Sent Successfully");
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as per your application's needs
+                // Example: _logger.LogError(ex, "An error occurred while sending the email.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+            }
+        }
+
+        [HttpPost]
+        [Route("sendemailto")]
+        public IActionResult SendEmailToClient(EmailModel modelName)
+        {
+            try
+            {
+                // Configure SMTP client
+                using (var client = new SmtpClient("smtp.gmail.com", 587))
+                {
+                    string filePath = "C:\\Users\\mgmga\\New-Project-Backend\\New-Project-Backend\\email temp\\emailToClient.html";
+                    string mailText = System.IO.File.ReadAllText(filePath);
+
+                    mailText = mailText.Replace("{{name}}", modelName.Name)
+                                       .Replace("{{email}}", modelName.Email);
+
+                    client.EnableSsl = true;
+                    client.Credentials = new NetworkCredential("mganesh120798@gmail.com", "gmci zafc snpj sjac");
+
+                    // Create message
+                    var mailMessage = new MailMessage
+                    {
+                        IsBodyHtml = true,
+                        From = new MailAddress("mganesh120798@gmail.com"),
+                        Subject = "Form Send From " + modelName.Name,
+                        Body = mailText
+                    };
+
+                    mailMessage.To.Add("mganesh120798@gmail.com");
+
+                    // Send email
+                    client.Send(mailMessage);
+                }
+
+                return Ok(ErrorCodes.BookAddedSuccessfully.ToString());
+
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as per your application's needs
+                // Example: _logger.LogError(ex, "An error occurred while sending the email.");
+                throw;
+            }
+        }
+    }
+
+       
 }

@@ -10,10 +10,7 @@ namespace New_Project_Backend.Extensions
 	{
 		public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
 		{
-			//services.AddDbContext<AIPOContext>(optionsAction: options =>
-			//{
-			//    options.UseNpgsql(config.GetConnectionString("Postgres"));
-			//});
+	
 
 			services.AddScoped<ITokenService, TokenService>();
 
@@ -31,9 +28,9 @@ namespace New_Project_Backend.Extensions
 				   };
 			   });
 
-			services.AddAuthorization();
+            services.AddAuthorization();
 
-			return services;
+            return services;
 		}
 	}
 }

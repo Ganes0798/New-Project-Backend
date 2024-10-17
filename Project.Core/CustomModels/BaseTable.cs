@@ -147,34 +147,6 @@ namespace Project.Core.CustomModels
 	}
 
 
-	public class LibraryBooks : BaseTable
-	{
-		public long Id { get; set; }
-
-		public string BookName { get; set; }
-
-		public string BookAuthor { get; set; }
-
-		public string BookSelfNumber { get; set; }
-
-		public string LibraryHandlerName { get; set; }
-	}
-
-	public class FormData : BaseTable
-	{
-		public long Id { get; set; }
-
-		public string Name { get; set; }
-
-		public string Email { get; set; }
-
-		public string PhoneNumber { get; set; }
-
-		public string Description { get; set; }
-
-
-	}
-
 
 	public class EmailModel
 	{
@@ -182,8 +154,6 @@ namespace Project.Core.CustomModels
 		public string? Name { get; set; }
 
 		public string? PhoneNumber { get; set; }
-
-		public string? Description { get; set; }
 	}
 
 
