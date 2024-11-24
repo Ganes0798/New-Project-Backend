@@ -23,6 +23,107 @@ namespace Project.Core.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "uuid-ossp");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Project.Core.CustomModels.BillingProduct", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("BillingId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on")
+                        .HasDefaultValueSql("Now()");
+
+                    b.Property<int>("DataState")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("data_state");
+
+                    b.Property<DateTime>("ModifiedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modified_on")
+                        .HasDefaultValueSql("Now()");
+
+                    b.Property<long>("ProductId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("numeric")
+                        .HasColumnName("total_amount");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BillingId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("billing_products", (string)null);
+                });
+
+            modelBuilder.Entity("Project.Core.CustomModels.Billings", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("BillingDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("billing_date");
+
+                    b.Property<string>("BillingReferenceNo")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("billing_ref_no");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on")
+                        .HasDefaultValueSql("Now()");
+
+                    b.Property<long>("CustomerFkId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("customer_fk");
+
+                    b.Property<int>("DataState")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("data_state");
+
+                    b.Property<DateTime>("ModifiedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modified_on")
+                        .HasDefaultValueSql("Now()");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("numeric")
+                        .HasColumnName("total_amount");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerFkId");
+
+                    b.ToTable("billings", (string)null);
+                });
+
             modelBuilder.Entity("Project.Core.CustomModels.CartDetails", b =>
                 {
                     b.Property<long>("Id")
@@ -112,54 +213,6 @@ namespace Project.Core.Migrations
                     b.ToTable("category", (string)null);
                 });
 
-            modelBuilder.Entity("Project.Core.CustomModels.Order", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("CreatedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_on")
-                        .HasDefaultValueSql("Now()");
-
-                    b.Property<int>("DataState")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(1)
-                        .HasColumnName("data_state");
-
-                    b.Property<DateTime>("ModifiedOn")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("modified_on")
-                        .HasDefaultValueSql("Now()");
-
-                    b.Property<long>("ProductFkId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("product_fk_id");
-
-                    b.Property<int>("ProductQuantity")
-                        .HasColumnType("integer")
-                        .HasColumnName("product_quantity");
-
-                    b.Property<long>("UserFkId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("user_fk_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductFkId");
-
-                    b.HasIndex("UserFkId");
-
-                    b.ToTable("order", (string)null);
-                });
-
             modelBuilder.Entity("Project.Core.CustomModels.Product", b =>
                 {
                     b.Property<long>("Id")
@@ -207,8 +260,8 @@ namespace Project.Core.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.Property<long>("ProductPrice")
-                        .HasColumnType("bigint")
+                    b.Property<decimal>("ProductPrice")
+                        .HasColumnType("numeric")
                         .HasColumnName("product_price");
 
                     b.Property<int>("TotalProducts")
@@ -281,6 +334,36 @@ namespace Project.Core.Migrations
                     b.ToTable("user", (string)null);
                 });
 
+            modelBuilder.Entity("Project.Core.CustomModels.BillingProduct", b =>
+                {
+                    b.HasOne("Project.Core.CustomModels.Billings", "Billing")
+                        .WithMany("BillingProducts")
+                        .HasForeignKey("BillingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Project.Core.CustomModels.Product", "Product")
+                        .WithMany("BillingProducts")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Billing");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Project.Core.CustomModels.Billings", b =>
+                {
+                    b.HasOne("Project.Core.CustomModels.Register", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerFkId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
             modelBuilder.Entity("Project.Core.CustomModels.CartDetails", b =>
                 {
                     b.HasOne("Project.Core.CustomModels.Product", "Product")
@@ -300,25 +383,6 @@ namespace Project.Core.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Project.Core.CustomModels.Order", b =>
-                {
-                    b.HasOne("Project.Core.CustomModels.Product", "product")
-                        .WithMany()
-                        .HasForeignKey("ProductFkId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Project.Core.CustomModels.Register", "register")
-                        .WithMany()
-                        .HasForeignKey("UserFkId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("product");
-
-                    b.Navigation("register");
-                });
-
             modelBuilder.Entity("Project.Core.CustomModels.Product", b =>
                 {
                     b.HasOne("Project.Core.CustomModels.Category", "CategoryById")
@@ -328,6 +392,16 @@ namespace Project.Core.Migrations
                         .IsRequired();
 
                     b.Navigation("CategoryById");
+                });
+
+            modelBuilder.Entity("Project.Core.CustomModels.Billings", b =>
+                {
+                    b.Navigation("BillingProducts");
+                });
+
+            modelBuilder.Entity("Project.Core.CustomModels.Product", b =>
+                {
+                    b.Navigation("BillingProducts");
                 });
 #pragma warning restore 612, 618
         }

@@ -29,8 +29,8 @@ namespace Project.Core.Data
         public DbSet<Category> categories { get; set; }
 
         public DbSet<CartDetails> cart { get; set; }
-        public DbSet<Order> Orders { get; set; }
-
+        public DbSet<Billings> billings { get; set; }
+        public DbSet<BillingProduct> billing_products { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -96,18 +96,42 @@ namespace Project.Core.Data
                 entity.Property(e => e.DataState).HasColumnName(CommonNames.DataState).HasDefaultValue(RecordState.Active);
             });
 
-            modelBuilder.Entity<Order>(entity =>
+            modelBuilder.Entity<Billings>(entity =>
             {
-				entity.ToTable(CommonNames.Order);
-				entity.Property(e => e.Id).HasColumnName(CommonNames.Id);
-				entity.Property(e => e.UserFkId).HasColumnName(CommonNames.UserFkId);
-				entity.Property(e => e.ProductFkId).HasColumnName(CommonNames.ProductFkId);
-                entity.Property(e => e.ProductQuantity).HasColumnName("product_quantity");
-				entity.Property(e => e.CreatedOn).HasColumnName(CommonNames.CreatedOn).HasDefaultValueSql(CommonNames.NOW);
-				entity.Property(e => e.ModifiedOn).HasColumnName(CommonNames.ModifiedOn).HasDefaultValueSql(CommonNames.NOW);
-				entity.Property(e => e.DataState).HasColumnName(CommonNames.DataState).HasDefaultValue(RecordState.Active);
-			});
-			OnModelCreatingPartial(modelBuilder);
+
+                entity.ToTable("billings");
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.BillingReferenceNo).HasColumnName("billing_ref_no");
+                entity.Property(e => e.BillingDate).HasColumnName("billing_date");
+                entity.Property(e => e.CustomerFkId).HasColumnName("customer_fk");
+                entity.Property(e => e.TotalAmount).HasColumnName("total_amount");
+                entity.Property(e => e.CreatedOn).HasColumnName(CommonNames.CreatedOn).HasDefaultValueSql(CommonNames.NOW);
+                entity.Property(e => e.ModifiedOn).HasColumnName(CommonNames.ModifiedOn).HasDefaultValueSql(CommonNames.NOW);
+                entity.Property(e => e.DataState).HasColumnName(CommonNames.DataState).HasDefaultValue(RecordState.Active);
+            });
+
+            modelBuilder.Entity<BillingProduct>(entity =>
+            {
+                entity.ToTable("billing_products");
+                entity.Property(bp => bp.Id).HasColumnName("id");
+                entity.Property(bp => bp.Quantity).HasColumnName("quantity");
+                entity.Property(bp => bp.TotalAmount).HasColumnName("total_amount");
+
+                entity.HasOne(bp => bp.Product)  // Each BillingProduct has one Product
+                      .WithMany(p => p.BillingProducts)  // A Product can be in many BillingProducts
+                      .HasForeignKey(bp => bp.ProductId)
+                      .OnDelete(DeleteBehavior.Restrict);  // Restrict cascade deletion of products
+
+                entity.HasOne(bp => bp.Billing)  // Each BillingProduct belongs to one Billing
+                      .WithMany(b => b.BillingProducts)  // A Billing can have many BillingProducts
+                      .HasForeignKey(bp => bp.BillingId)  // Foreign key pointing to Billing
+                      .OnDelete(DeleteBehavior.Cascade);  // Cascade delete if Billing is deleted
+
+                entity.Property(e => e.CreatedOn).HasColumnName(CommonNames.CreatedOn).HasDefaultValueSql(CommonNames.NOW);
+                entity.Property(e => e.ModifiedOn).HasColumnName(CommonNames.ModifiedOn).HasDefaultValueSql(CommonNames.NOW);
+                entity.Property(e => e.DataState).HasColumnName(CommonNames.DataState).HasDefaultValue(RecordState.Active);
+            });
+            OnModelCreatingPartial(modelBuilder);
         }
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }

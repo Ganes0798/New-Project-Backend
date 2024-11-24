@@ -62,7 +62,7 @@ namespace Project.Core.Migrations
                     name = table.Column<string>(type: "text", nullable: false),
                     description = table.Column<string>(type: "character varying(8129)", maxLength: 8129, nullable: false),
                     image_url = table.Column<string>(type: "text", nullable: false),
-                    product_price = table.Column<long>(type: "bigint", nullable: false),
+                    product_price = table.Column<decimal>(type: "numeric", nullable: false),
                     total_products = table.Column<int>(type: "integer", nullable: false),
                     category_fk_id = table.Column<long>(type: "bigint", nullable: false),
                     created_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "Now()"),
@@ -76,6 +76,31 @@ namespace Project.Core.Migrations
                         name: "FK_products_category_category_fk_id",
                         column: x => x.category_fk_id,
                         principalTable: "category",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "billings",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    billing_ref_no = table.Column<string>(type: "text", nullable: false),
+                    billing_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    customer_fk = table.Column<long>(type: "bigint", nullable: false),
+                    total_amount = table.Column<decimal>(type: "numeric", nullable: false),
+                    created_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "Now()"),
+                    modified_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "Now()"),
+                    data_state = table.Column<int>(type: "integer", nullable: false, defaultValue: 1)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_billings", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_billings_user_customer_fk",
+                        column: x => x.customer_fk,
+                        principalTable: "user",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -111,34 +136,50 @@ namespace Project.Core.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "order",
+                name: "billing_products",
                 columns: table => new
                 {
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    product_fk_id = table.Column<long>(type: "bigint", nullable: false),
-                    user_fk_id = table.Column<long>(type: "bigint", nullable: false),
-                    product_quantity = table.Column<int>(type: "integer", nullable: false),
+                    ProductId = table.Column<long>(type: "bigint", nullable: false),
+                    BillingId = table.Column<long>(type: "bigint", nullable: false),
+                    quantity = table.Column<int>(type: "integer", nullable: false),
+                    total_amount = table.Column<decimal>(type: "numeric", nullable: false),
                     created_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "Now()"),
                     modified_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "Now()"),
                     data_state = table.Column<int>(type: "integer", nullable: false, defaultValue: 1)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_order", x => x.id);
+                    table.PrimaryKey("PK_billing_products", x => x.id);
                     table.ForeignKey(
-                        name: "FK_order_products_product_fk_id",
-                        column: x => x.product_fk_id,
+                        name: "FK_billing_products_billings_BillingId",
+                        column: x => x.BillingId,
+                        principalTable: "billings",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_billing_products_products_ProductId",
+                        column: x => x.ProductId,
                         principalTable: "products",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_order_user_user_fk_id",
-                        column: x => x.user_fk_id,
-                        principalTable: "user",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_billing_products_BillingId",
+                table: "billing_products",
+                column: "BillingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_billing_products_ProductId",
+                table: "billing_products",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_billings_customer_fk",
+                table: "billings",
+                column: "customer_fk");
 
             migrationBuilder.CreateIndex(
                 name: "IX_cart_product_fk_id",
@@ -151,16 +192,6 @@ namespace Project.Core.Migrations
                 column: "user_fk_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_order_product_fk_id",
-                table: "order",
-                column: "product_fk_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_order_user_fk_id",
-                table: "order",
-                column: "user_fk_id");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_products_category_fk_id",
                 table: "products",
                 column: "category_fk_id");
@@ -170,10 +201,13 @@ namespace Project.Core.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "billing_products");
+
+            migrationBuilder.DropTable(
                 name: "cart");
 
             migrationBuilder.DropTable(
-                name: "order");
+                name: "billings");
 
             migrationBuilder.DropTable(
                 name: "products");

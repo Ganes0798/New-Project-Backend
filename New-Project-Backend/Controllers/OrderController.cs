@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using New_Project_Backend.Model;
 using Project.Core.CustomModels;
 using Project.Core.Data;
@@ -7,6 +9,7 @@ using static Project.Core.Enums.CommonEnums;
 
 namespace New_Project_Backend.Controllers
 {
+    [AllowAnonymous]
 	[EnableCors("_allowOriginPolicy")]
 	[Route("api/[controller]")]
 	[ApiController]
@@ -17,100 +20,57 @@ namespace New_Project_Backend.Controllers
 
 		}
 
+        [HttpPost]
+        public async Task<IActionResult> SaveBilling([FromBody] BillingRequest request)
+        {
+            try
+            {
+                using (ProjectDbContext dbContext = new ProjectDbContext(c_config))
+                {
+                    var customer = await dbContext.Users.FirstOrDefaultAsync(c => c.Id == request.CustomerId);
+                    if (customer == null)
+                    {
+                        return BadRequest("Customer not found");
+                    }
 
-		[HttpGet]
-		public ActionResult Get([FromQuery] long? id)
-		{
-			var _userDetails = GetCurrentUserDetail();
-			try
-			{
-				using (ExtendedProjectDbContext dbContext = new ExtendedProjectDbContext(c_config))
-				{
-					var _getOrders = dbContext.Orders.Where(xy => ((id.HasValue ? (xy.Id == id) : true) && (xy.DataState == RecordState.Active)))
-													  .OrderBy(xy => xy.Id)
-													  .Select(ab => new Order()
-													  {
-														  Id = ab.Id,
-														  product = new Product()
-														  {
-															  Id = ab.product.Id,
-															  ProductName = ab.product.ProductName,
-															  ProductDescription = ab.product.ProductDescription,
-															  TotalProducts = ab.product.TotalProducts
-														  },
-														  register = new Register()
-														  {
-															  Id = ab.register.Id,
-															  FirstName = ab.register.FirstName,
-															  LastName = ab.register.LastName,
-															  Email = ab.register.Email,
-														  },
-														  CreatedOn = ab.CreatedOn,
-														  ModifiedOn = ab.ModifiedOn
+                    // Create a new billing record
+                    var billing = new Billings
+                    {
+                        BillingReferenceNo = request.BillingReferenceNo,
+                        BillingDate = DateTime.UtcNow,
+                        TotalAmount = request.TotalAmount,
+                        Customer = customer,
+                        BillingProducts = request.Products.Select(p => new BillingProduct
+                        {
+                            Product = new Product { ProductName = p.Name, ProductPrice = p.MRP, ProductImageUrl = p.ProductImage, ProductDescription = p.ProductDesc, CategoryCode = p.categoryCode },
+                            Quantity = p.Quantity,
+                            TotalAmount = p.TotalAmount
+                        }).ToList()
+                    };
 
-													  }).ToList();
+                    // Add billing to the database
+                    dbContext.billings.Add(billing);
+                    await dbContext.SaveChangesAsync();
 
-					if(_getOrders == null || _getOrders.Count == 0)
-					{
-						return SendErrorMessage(ErrorCodes.EmptyOrderList);
-					}
-					else
-					{
-						if(id.HasValue)
-						{
-							return Ok(new ResponseBodyResource<Order>()
-							{
-								Result = _getOrders[0]
-							});
-						}
-						else
-						{
-							return Ok(new ResponseBodyResource<List<Order>>()
-							{
-								Result = _getOrders
-							});
-						}
-					}
-				}
-			}
-			catch(Exception)
-			{
-				throw;
-			}
-		}
+                    return Ok(new ResponseBodyResource<Billings>()
+                    {
+                        Message = ErrorCodes.OrderPlacedSuccessfully.ToString(),
+                    });
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
 
+        }
+    }
+    //protected string GenerateRandomOrderId(int length, DateTime date)
+    //{
+    //    const string chars = "EHOUSE1234567890";
+    //    Random random = new Random();
+    //    return new string(Enumerable.Repeat(chars, length)
+    //        .Select(s => s[random.Next(s.Length)]).ToArray());
+    //}
 
-
-		[HttpPost]
-		public ActionResult Add([FromBody] CreateOrder order)
-		{
-			try
-			{
-				using(ExtendedProjectDbContext dbContext = new ExtendedProjectDbContext(c_config))
-				{
-					var _newOrder = new Order()
-					{
-						ProductFkId = order.ProductFkId,
-						UserFkId = order.UserFkId
-					};
-					using(var transaction = dbContext.Database.BeginTransaction())
-					{
-						dbContext.Orders.Add(_newOrder);
-						dbContext.SaveChanges();
-						transaction.Commit();
-
-						return Ok(new ResponseBodyResource<Order>()
-						{
-							Message = ErrorCodes.OrderPlacedSuccessfully.ToString(),
-							Result = _newOrder
-						});
-					}
-				}
-			}
-			catch(Exception)
-			{
-				throw;
-			}
-		}
-	}
 }

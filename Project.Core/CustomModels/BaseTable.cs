@@ -94,13 +94,15 @@ namespace Project.Core.CustomModels
 
 		public string ProductImageUrl { get; set; } = string.Empty;
 
-		public long ProductPrice { get; set; }
+		public decimal ProductPrice { get; set; }
 		public int TotalProducts { get; set; }
 
 		[ForeignKey("CategoryCode")]
 		public Category CategoryById { get; set; }
 
 		public long CategoryCode { get; set; }
+
+		public ICollection<BillingProduct> BillingProducts { get; set; }
 	}
 
 	public class Category : BaseTable
@@ -128,27 +130,59 @@ namespace Project.Core.CustomModels
 		public long Quantity { get; set; }
 
 	}
-	public class Order : BaseTable
-	{
-		[Key]
-		public long Id { get; set; }
+    public class Billings : BaseTable
+    {
+        public long Id { get; set; }
+        public string BillingReferenceNo { get; set; }
+        public DateTime BillingDate { get; set; }
 
-		[ForeignKey("ProductFkId")]
-		public Product product { get; set; }
+        [ForeignKey("CustomerFkId")]
+        public Register Customer { get; set; }
 
-		public long ProductFkId { get; set; }
+        public long CustomerFkId { get; set; }
 
-		[ForeignKey("UserFkId")]
-		public Register register { get; set; } 
+        public decimal TotalAmount { get; set; }
+        public ICollection<BillingProduct> BillingProducts { get; set; }
+    }
 
-		public long UserFkId { get; set;}
+    public class BillingProduct : BaseTable
+    {
+        public long Id { get; set; }
+        public long ProductId { get; set; }
 
-		public int ProductQuantity { get; set; }
-	}
+        public long BillingId { get; set; }
+        public Billings Billing { get; set; }
+        public Product Product { get; set; }
+        public int Quantity { get; set; }
+        public decimal TotalAmount { get; set; }
+    }
+
+    public class BillingRequest
+    {
+        public int CustomerId { get; set; }
+        public string BillingReferenceNo { get; set; }
+        public decimal SubTotal { get; set; }
+
+        public decimal TotalAmount { get; set; }
+        public List<BillingProductRequest> Products { get; set; }
+    }
+
+    public class BillingProductRequest
+    {
+        public string Name { get; set; }
+        public decimal MRP { get; set; }
+        public string ProductImage { get; set; }
+
+		public string ProductDesc { get; set; }
+        public int Quantity { get; set; }
+        public decimal TotalAmount { get; set; }
+
+		public long categoryCode { get; set; }
+    }
 
 
 
-	public class EmailModel
+    public class EmailModel
 	{
 		public string Email { get; set; }
 		public string? Name { get; set; }
